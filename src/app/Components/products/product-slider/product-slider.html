@@ -1,0 +1,5 @@
+<swiper-container #swiperContainer init="false" class="product-slider p-5">
+  <swiper-slide *ngFor="let product of products">
+    <app-product-card [product]="product"></app-product-card>
+  </swiper-slide>
+</swiper-container>

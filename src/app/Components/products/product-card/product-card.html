@@ -1,0 +1,21 @@
+
+<div class="product-card" [routerLink]="['/product', product.id]" style="cursor: pointer;">
+  <div class="product-image">
+    <img [src]="product.imageUrl" [alt]="product.name">
+    <button class="add-to-cart-btn">
+      Add to Cart
+    </button>
+  </div>
+  <div class="product-details">
+    <h5>{{ product.name }}</h5>
+    <p>{{ product.description }}</p>
+    
+
+    <div class="rating" [innerHTML]="getStars(product.averageRating)"></div>
+
+    <p class="price">
+      {{ product.price | currency:'USD' }}
+      <span class="old-price">{{ 50 | currency:'USD' }}</span>
+    </p>
+  </div>
+</div>

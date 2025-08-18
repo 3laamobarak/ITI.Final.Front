@@ -1,0 +1,87 @@
+/* Write your CSS code here */
+*,
+*::after,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+    cursor: none;
+    font-family: "Rubik", sans-serif;
+    overflow: hidden;
+    position: relative;
+}
+
+.page-container {
+    display: flex;
+    align-items: center;
+    margin: 0 80px;
+    color: white;
+}
+
+
+.img {
+    animation-name: wiggle;
+    animation-duration:1000ms;
+    animation-fill-mode: both;
+    animation-timing-function:linear;
+    animation-iteration-count: 8;
+    transform:rotate(30deg);
+    width: 300px;
+}
+
+.texts {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: 10px
+}
+
+.texts>h1 {
+    font-size: 100px;
+}
+
+.texts>p {
+    font-size: 20px;
+}
+
+.texts>span {
+    margin-top: 10px;
+    font-size: 15px;
+}
+
+a {
+    text-decoration: none;
+    color: #e6ff17
+}
+
+.cursor {
+    position: absolute;
+    pointer-events: none;
+    width: 50px;
+    height: 50px;
+    background-color: white;
+    border-radius: 50%;
+    mix-blend-mode: difference;
+    box-shadow: 0 0 50px white;
+    transform: translate(-50%,-50%);
+    transition: transform 500ms ease;
+}
+
+.page-container:has(.texts:hover)>.cursor {
+    transform: scale(1.5)
+}
+
+@keyframes wiggle{
+
+  50%{
+        transform: rotate(-30deg);
+    }
+}

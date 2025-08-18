@@ -1,0 +1,240 @@
+/* wrapper: side-by-side always */
+.product-page-wrapper {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 12px;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: auto; /* allow horizontal scroll on tiny screens */
+}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar {
+  flex: 0 0 220px; /* ثابت تقريبًا */
+  max-width: 220px;
+  box-sizing: border-box;
+}
+
+.sidebar-card {
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  padding: 12px;
+  height: calc(100vh - 24px); /* full height minus padding */
+  overflow-y: auto; /* scroll inside sidebar if long */
+}
+
+.sidebar-header h5 {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+}
+
+.brand-search input {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+/* brand list */
+.brand-list {
+  margin: 10px 0 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.brand-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.brand-item:hover {
+  background: #f5f5f5;
+}
+.brand-item.active {
+  background: #e9f7ef;
+  border-left: 3px solid #28a745;
+}
+
+.brand-item input[type="checkbox"] {
+  pointer-events: none;
+  margin-right: 6px;
+}
+.brand-name {
+  flex: 1;
+  margin-left: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.badge-count {
+  background: #f1f1f1;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+/* footer */
+.sidebar-footer {
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* ---------- PRODUCTS AREA ---------- */
+.products-area {
+  flex: 1 1 auto; /* takes remaining space */
+  min-width: 300px; /* avoid shrinking too much */
+  box-sizing: border-box;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+  padding: 0;
+  margin: 0;
+}
+
+/* product card tweaks (depends on your app-product-card) */
+app-product-card,
+.product-card {
+  display: block;
+  height: 100%;
+}
+
+/* images inside card (if exists) */
+.product-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: contain;
+}
+
+/* responsive tweaks: keep sidebar on side but reduce width */
+@media (max-width: 600px) {
+  .product-page-wrapper {
+    gap: 10px;
+    padding: 8px;
+  }
+  .sidebar {
+    flex: 0 0 160px;
+    max-width: 160px;
+  }
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .product-card img {
+    height: 140px;
+  }
+}
+
+/* very tiny screens: still side-by-side but allow horizontal scroll */
+@media (max-width: 360px) {
+  .sidebar {
+    flex: 0 0 140px;
+    max-width: 140px;
+  }
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+/* سعر الفلتر */
+.price-card {
+  margin-top: 35px;
+  border-top: 1px solid #eee;
+  padding-top: 12px;
+}
+
+.price-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.price-filter label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #fafafa;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.price-filter label:hover {
+  background: #f0f8ff;
+  transform: translateX(2px);
+}
+
+.price-filter input[type="radio"] {
+  accent-color: #007bff;
+  width: 16px;
+  height: 16px;
+}
+
+/* Rating filter styles */
+/* Rating filter styles */
+.rating-card {
+  margin-top: -345px; /* مسافة فوق الفلتر */
+  padding: 10px 0; /* padding داخلي بسيط */
+  border-top: 1px solid #eee;
+}
+
+.rating-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* مسافة بين كل صف نجوم */
+  margin-top: 10px;
+}
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* مسافة صغيرة بين العناصر داخل الصف */
+  padding: 6px 8px; /* padding داخلي */
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s, transform 0.04s;
+}
+
+.rating-row:hover {
+  background: #f9fafb;
+  transform: translateX(2px);
+}
+
+.rating-row.active {
+  background: #eef6ff;
+  border-left: 3px solid #2563eb;
+  padding-left: 10px;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 4px; /* مسافة بين النجوم نفسها */
+  align-items: center;
+}
+
+.star {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+}
+
+.star.filled path {
+  fill: #f5c518; /* أصفر */
+}
+
+.star.empty path {
+  stroke: #d1d5db; /* رمادي للنجوم الفاضية */
+}

@@ -1,0 +1,85 @@
+
+<!-- banner-slider.component.html -->
+<div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <img src="/Images/b1.avif" class="d-block w-100" alt="Banner 1" />
+    </div>
+    <div class="carousel-item">
+      <img src="/Images/b3.avif" class="d-block w-100" alt="Banner 3" />
+    </div>
+    <div class="carousel-item">
+      <img src="/Images/b4.avif" class="d-block w-100" alt="Banner 2" />
+    </div>
+    <div class="carousel-item">
+      <img src="/Images/b5.avif" class="d-block w-100" alt="Banner 2" />
+    </div>
+  </div>
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+  </button>
+</div>
+
+
+
+
+<!-- Slider -->
+
+<section class="my-1 p-3">
+  <div class="best-sellers-header">
+  <h3>Best Sellers</h3>
+  <a routerLink="/productsList">See All products</a>
+</div>
+
+  <app-product-slider [products]="products"></app-product-slider>
+</section>
+
+
+
+
+<!-- categories -->
+
+<section class=" p-3">
+  <h3 class="mb-4">Shop By Categories</h3>
+  <app-category-slider [categories]="categories"></app-category-slider>
+</section>
+
+
+<section class="my-4 p-3 why-section">
+  <h3 class="mb-4 text-start">Why FitZone?</h3>
+  <div class="why-items">
+    <div class="why-item">
+      <i class="bi bi-patch-check"></i>
+      <h5>50,000+ Authentic products</h5>
+      <p>Directly sourced products from authorized distributors.</p>
+    </div>
+
+    <div class="why-item">
+      <i class="bi bi-house-door"></i>
+      <h5>Freshness guaranteed</h5>
+      <p>Temperature-controlled facilities to ensure quality.</p>
+    </div>
+
+    <div class="why-item">
+      <i class="bi bi-headset"></i>
+      <h5>24/7 customer service</h5>
+      <p>Customer service is a click away.</p>
+    </div>
+
+    <div class="why-item">
+      <i class="bi bi-star"></i>
+      <h5>Genuine reviews</h5>
+      <p>Verified customer reviews help you make smarter buying choices.</p>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+

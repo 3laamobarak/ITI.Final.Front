@@ -1,0 +1,170 @@
+<div class="product-page-wrapper">
+  <!-- sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-header">
+        <h5>Filter by Brand</h5>
+        <div class="brand-search">
+          <input
+            type="text"
+            placeholder="Search brands"
+            (input)="onSearchInput($any($event.target).value)"
+            [value]="brandSearch"
+          />
+        </div>
+      </div>
+
+      <ul class="brand-list">
+        <li
+          class="brand-item"
+          [class.active]="selectedBrandId === null"
+          (click)="filterByBrand(null)"
+        >
+          <input
+            type="checkbox"
+            [checked]="selectedBrandId === null"
+            readonly
+          />
+          <span class="brand-name">All Brands</span>
+          <span class="badge-count">{{ allProducts?.length || 0 }}</span>
+        </li>
+
+        <li
+          *ngFor="let brand of displayedBrands"
+          class="brand-item"
+          [class.active]="selectedBrandId === brand.id"
+          (click)="filterByBrand(brand.id)"
+        >
+          <input
+            type="checkbox"
+            [checked]="selectedBrandId === brand.id"
+            readonly
+          />
+          <span class="brand-name">{{ brand.name }}</span>
+          <span class="badge-count">{{ brand.count || 0 }}</span>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <a href="javascript:void(0)" (click)="toggleShowAll()">{{
+          showAllBrands ? "Show less" : "Show more"
+        }}</a>
+      </div>
+
+      <!-- Price filter -->
+      <div class="sidebar-card price-card">
+        <div class="sidebar-header">
+          <h5>Filter by Price</h5>
+        </div>
+        <div class="price-filter">
+          <label>
+            <input
+              type="radio"
+              name="priceRange"
+              [value]="null"
+              [(ngModel)]="selectedPriceRangeId"
+              (change)="filterByPrice()"
+            />
+            <span>All Prices</span>
+          </label>
+
+          <label *ngFor="let range of priceRanges">
+            <input
+              type="radio"
+              name="priceRange"
+              [value]="range.id"
+              [(ngModel)]="selectedPriceRangeId"
+              (change)="filterByPrice()"
+            />
+            <span>{{ range.label }}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Rating filter (stars + counts) -->
+      <div class="sidebar-card rating-card">
+        <div class="sidebar-header">
+          <h5>Filter by Rating</h5>
+        </div>
+
+        <div class="rating-list">
+          <!-- All Ratings -->
+          <div
+            class="rating-row"
+            [class.active]="selectedRating === null"
+            (click)="setRatingFilter(null)"
+          >
+            <div class="rating-stars">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="#f5c518"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 17.3L7.2 20l1-5.4L4 11.4l5.5-.8L12 6l2.5 4.6L20 11.4l-4.2 3.2L16.8 20z"
+                />
+              </svg>
+            </div>
+            <div class="rating-label">All Ratings</div>
+            <div class="rating-count">{{ allProducts?.length || 0 }}</div>
+          </div>
+
+          <!-- each rating option -->
+          <div
+            *ngFor="let r of ratingOptions"
+            class="rating-row"
+            [class.active]="selectedRating === r"
+            (click)="setRatingFilter(r)"
+          >
+            <div class="rating-stars">
+              <ng-container *ngFor="let s of [1, 2, 3, 4, 5]">
+                <svg
+                  *ngIf="s <= r"
+                  class="star filled"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M12 17.3L7.2 20l1-5.4L4 11.4l5.5-.8L12 6l2.5 4.6L20 11.4l-4.2 3.2L16.8 20z"
+                  />
+                </svg>
+                <svg
+                  *ngIf="s > r"
+                  class="star empty"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M12 17.3L7.2 20l1-5.4L4 11.4l5.5-.8L12 6l2.5 4.6L20 11.4l-4.2 3.2L16.8 20z"
+                    fill="none"
+                    stroke="#ccc"
+                    stroke-width="1.2"
+                  />
+                </svg>
+              </ng-container>
+            </div>
+
+            <!-- <div class="rating-label">{{ r }}</div>-->
+
+            <div class="rating-count">
+              {{ getRatingCount(r) }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- products -->
+  <main class="products-area">
+    <div class="product-grid">
+      <app-product-card
+        *ngFor="let product of products"
+        [product]="product"
+      ></app-product-card>
+    </div>
+  </main>
+
+</div>

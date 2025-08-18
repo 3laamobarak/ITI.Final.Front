@@ -1,0 +1,41 @@
+
+.product-slider {
+  max-width: 100%;
+  padding-left: 50px;
+}
+
+
+.product-slider .card {
+  max-width: 220px;
+  margin: auto;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+
+.product-slider .card-img-top {
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+
+.swiper-button-next,
+.swiper-button-prev {
+  width: 30px;
+  height: 30px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 14px;
+  color: #333;
+}
+

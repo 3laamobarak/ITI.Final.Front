@@ -1,0 +1,48 @@
+.best-sellers-header {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.best-sellers-header a {
+  color: blue; 
+  text-decoration: underline; 
+  font-size: 18px; 
+  cursor: pointer;
+}
+
+
+
+
+
+.why-section {
+  text-align:center;
+}
+
+.why-items {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.why-item {
+  flex: 1 1 200px;
+  max-width: 250px;
+}
+
+.why-item i {
+  font-size: 40px;
+  color: #5ba600; /* اللون الأخضر */
+  margin-bottom: 10px;
+  display: block;
+}
+
+.why-item h5 {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.why-item p {
+  color: #555;
+  font-size: 14px;
+}

@@ -1,0 +1,12 @@
+<swiper-container
+  slides-per-view="4"
+  space-between="15"
+  navigation="true"
+  pagination="false"
+>
+  <swiper-slide *ngFor="let category of categories">
+    <div class="category-slide">
+      <span class="category-name">{{ category.name }}</span>
+    </div>
+  </swiper-slide>
+</swiper-container>

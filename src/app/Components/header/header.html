@@ -1,0 +1,78 @@
+<!-- Top Bar -->
+
+<div
+  class="top-bar d-flex justify-content-between align-items-center px-4 py-1 bg-light small"
+>
+
+  <div class="offer text-success">🌿 10% off your first order!</div>
+  <div class="d-flex align-items-center">
+    <span class="me-3"> English | Egypt</span>
+    <span class="share-icon">
+      <i class="fa-solid fa-share-nodes text-warning"></i>
+    </span>
+  </div>
+</div>
+
+<!-- Middle Bar -->
+
+<div class="middle-bar d-flex justify-content-between align-items-center px-4 py-2 bg-success">
+  <!-- Logo -->
+  <div class="logo">
+    <a [routerLink]="'/home'" class="text-white fw-bold fs-2 text-decoration-none logo-link">
+      FitZone
+    </a>
+  </div>
+
+  <!-- Search Input -->
+  <!-- header.html -->
+  <div class="flex-grow-1 mx-3 position-relative">
+    <div class="input-group">
+      <input
+        #searchInput
+        type="text"
+        class="form-control rounded-5 pe-5"
+        placeholder="Search for a product or ingredient..."
+        (keyup.enter)="onSearch(searchInput.value)"
+      />
+      <span
+        class="position-absolute top-50 end-0 translate-middle-y me-3 text-muted"
+        style="cursor: pointer"
+        (click)="onSearch(searchInput.value)"
+      >
+
+        <i class="fas fa-search"></i>
+      </span>
+    </div>
+  </div>
+
+
+
+  <!-- Right Actions -->
+  <div class="d-flex align-items-center">
+    <a routerLink="/login" class="me-3 text-white text-decoration-none"> <i class="fas fa-user text-white"></i>
+      Sign In</a>
+    <a routerLink="/cart" class="text-dark text-decoration-none"><i class="fas fa-shopping-cart text-white"></i>
+    </a>
+  </div>
+</div>
+
+<!-- Main Navigation -->
+
+<div style="width: 100%; background-color: #f8f9fa; border-bottom: 1px solid #ddd;">
+  <nav class="main-nav px-4">
+    <ul class="nav">
+      <li class="nav-item dropdown" *ngFor="let category of categories">
+        <a class="nav-link text-black " href="#" role="button" data-bs-toggle="dropdown"
+          style="padding-right: 10px; padding-left: 10px;">
+          {{ category.name }}
+        </a>
+        <ul class="dropdown-menu">
+          <li *ngFor="let sub of category.subcategories">
+            <a class="dropdown-item" href="#">{{ sub }}</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+</div>
