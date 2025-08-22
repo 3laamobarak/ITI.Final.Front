@@ -4,20 +4,18 @@ import { NotFound } from './Components/not-found/not-found';
 import { ProductList } from './Components/products/product-list/product-list';
 
 import { ProductDetails } from './Components/products/product-details/product-details';
+import { LoginRegister } from './Components/login-register/login-register';
 
 export const routes: Routes = [
 
     { path: '', redirectTo: '/home', pathMatch: 'full' },
-
     {path: 'home' , component: Home},
-
     {path: 'productsList' , component: ProductList},
-
-
-     { path: 'product/:id', component: ProductDetails },
-
+    { path: 'product/:id', component: ProductDetails },
     {path: 'NotFound' , component: NotFound},
-
+    {path: 'login-register' , component: LoginRegister}, // Add this line
+    
+    
     {path: '**', redirectTo: '/NotFound'}
    
 ];

@@ -1,0 +1,88 @@
+<!-- Corrected template to call the new validation methods -->
+<!-- Login/Register Page -->
+<div class="book-auth-container">
+  <div class="book">
+    <div class="book-page" [class.flipped]="!isLogin">
+      <!-- Login Page -->
+      <form (ngSubmit)="onLoginSubmit()" class="auth-form book-face">
+        <h2>Login</h2>
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <input id="loginEmail" type="email" [(ngModel)]="loginData.email" name="loginEmail" required email (input)="validateLoginFields()" />
+          <div class="error" *ngIf="loginErrors.email">{{ loginErrors.email }}</div>
+        </div>
+        <div class="form-group password-group">
+          <label for="loginPassword">Password</label>
+          <div class="password-wrapper">
+            <input id="loginPassword" [type]="showLoginPassword ? 'text' : 'password'" [(ngModel)]="loginData.password" name="loginPassword" required minlength="6" (input)="validateLoginFields()" />
+            <span class="eye-icon" (click)="showLoginPassword = !showLoginPassword">
+              <i class="fa" [ngClass]="showLoginPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </span>
+          </div>
+          <div class="error" *ngIf="loginErrors.password">{{ loginErrors.password }}</div>
+        </div>
+        <button type="submit" class="btn">Login</button>
+        <div class="switch-link">
+          Don’t have an account?
+          <a (click)="toggleForm(false)">Sign up</a>
+        </div>
+      </form>
+    </div>
+    <div class="book-page back-page" [class.flipped]="isLogin">
+      <!-- Register Page -->
+      <form (ngSubmit)="onRegisterSubmit()" class="auth-form">
+        <h2>Register</h2>
+        <div class="form-group">
+          <label for="userName">User Name</label>
+          <input id="userName" type="text" [(ngModel)]="registerData.userName" name="userName" required (input)="validateRegisterFields()" />
+          <div class="error" *ngIf="registerErrors.userName">{{ registerErrors.userName }}</div>
+        </div>
+        <div class="form-group">
+          <label for="firstName">First Name</label>
+          <input id="firstName" type="text" [(ngModel)]="registerData.firstName" name="firstName" required (input)="validateRegisterFields()" />
+          <div class="error" *ngIf="registerErrors.firstName">{{ registerErrors.firstName }}</div>
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last Name</label>
+          <input id="lastName" type="text" [(ngModel)]="registerData.lastName" name="lastName" required (input)="validateRegisterFields()" />
+          <div class="error" *ngIf="registerErrors.lastName">{{ registerErrors.lastName }}</div>
+        </div>
+        <div class="form-group">
+          <label for="nid">National ID</label>
+          <input id="nid" type="text" [(ngModel)]="registerData.nid" name="nid" required pattern="^[0-9]{14}$" (input)="validateRegisterFields()" />
+          <div class="error" *ngIf="registerErrors.nid">{{ registerErrors.nid }}</div>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input id="email" type="email" [(ngModel)]="registerData.email" name="email" required email (input)="validateRegisterFields()" />
+          <div class="error" *ngIf="registerErrors.email">{{ registerErrors.email }}</div>
+        </div>
+        <div class="form-group password-group">
+          <label for="password">Password</label>
+          <div class="password-wrapper">
+            <input id="password" [type]="showRegisterPassword ? 'text' : 'password'" [(ngModel)]="registerData.password" name="password" required minlength="6" (input)="validateRegisterFields()" />
+            <span class="eye-icon" (click)="showRegisterPassword = !showRegisterPassword">
+              <i class="fa" [ngClass]="showRegisterPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </span>
+          </div>
+          <div class="error" *ngIf="registerErrors.password">{{ registerErrors.password }}</div>
+        </div>
+        <div class="form-group password-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <div class="password-wrapper">
+            <input id="confirmPassword" [type]="showRegisterConfirmPassword ? 'text' : 'password'" [(ngModel)]="registerData.confirmPassword" name="confirmPassword" required (input)="validateRegisterFields()" />
+            <span class="eye-icon" (click)="showRegisterConfirmPassword = !showRegisterConfirmPassword">
+              <i class="fa" [ngClass]="showRegisterConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </span>
+          </div>
+          <div class="error" *ngIf="registerErrors.confirmPassword">{{ registerErrors.confirmPassword }}</div>
+        </div>
+        <button type="submit" class="btn">Register</button>
+        <div class="switch-link">
+          Already have an account?
+          <a (click)="toggleForm(true)">Log in</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
