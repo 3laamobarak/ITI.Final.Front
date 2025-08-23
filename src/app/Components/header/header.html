@@ -3,7 +3,6 @@
 <div
   class="top-bar d-flex justify-content-between align-items-center px-4 py-1 bg-light small"
 >
-
   <div class="offer text-success">🌿 10% off your first order!</div>
   <div class="d-flex align-items-center">
     <span class="me-3"> English | Egypt</span>
@@ -15,64 +14,214 @@
 
 <!-- Middle Bar -->
 
-<div class="middle-bar d-flex justify-content-between align-items-center px-4 py-2 bg-success">
+<div
+  class="middle-bar d-flex justify-content-between align-items-center px-4 py-2 bg-success"
+>
   <!-- Logo -->
   <div class="logo">
-    <a [routerLink]="'/home'" class="text-white fw-bold fs-2 text-decoration-none logo-link">
+    <a
+      [routerLink]="'/home'"
+      class="text-white fw-bold fs-2 text-decoration-none logo-link"
+    >
       FitZone
     </a>
   </div>
 
   <!-- Search Input -->
   <!-- header.html -->
-  <div class="flex-grow-1 mx-3 position-relative">
-    <div class="input-group">
+  <div class="header-wrapper">
+    <div class="input-holder">
       <input
         #searchInput
         type="text"
-        class="form-control rounded-5 pe-5"
+        class="search-input"
         placeholder="Search for a product or ingredient..."
+        (input)="onInput(searchInput.value)"
         (keyup.enter)="onSearch(searchInput.value)"
+        (focus)="onFocus()"
+        (keydown)="onKeyDown($event)"
+        [value]="query"
+        aria-label="Search products"
+        aria-haspopup="listbox"
+        [attr.aria-expanded]="showPanel ? 'true' : 'false'"
       />
-      <span
-        class="position-absolute top-50 end-0 translate-middle-y me-3 text-muted"
-        style="cursor: pointer"
+      <button
+        class="btn-search"
+        type="button"
         (click)="onSearch(searchInput.value)"
+        aria-label="search"
       >
-
         <i class="fas fa-search"></i>
-      </span>
+      </button>
+    </div>
+
+    <!-- Overlay (darken background) -->
+    <div class="overlay" *ngIf="showPanel" (click)="closePanel()"></div>
+
+    <!-- Panel -->
+    <div
+      class="search-panel"
+      *ngIf="showPanel"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="panel-left">
+        <!-- Search history -->
+        <div class="panel-section" *ngIf="searchHistory?.length">
+          <div class="section-header">
+            <span>Search history</span>
+            <button class="clear-btn" (click)="clearHistory()">Clear</button>
+          </div>
+          <ul class="history-list" role="list">
+            <li *ngFor="let h of searchHistory; let i = index" role="listitem">
+              <a (click)="onSearch(h)">{{ h }}</a>
+              <button class="x" (click)="removeHistoryItem(i)">✕</button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Suggestions -->
+        <div class="panel-section">
+          <div class="section-header"><span>Suggestions</span></div>
+          <div *ngIf="isLoading" class="loading">Loading…</div>
+
+          <ul class="suggest-list" role="listbox" *ngIf="!isLoading">
+            <li
+              *ngFor="let s of suggestions; let i = index"
+              id="sug-{{ i }}"
+              role="option"
+              [attr.aria-selected]="highlightedIndex === i"
+              (click)="onSelectSuggestion(s)"
+              [class.active]="highlightedIndex === i"
+            >
+              <div class="s-name">{{ s.name }}</div>
+            </li>
+
+            <li
+              *ngIf="!suggestions?.length && !searchHistory?.length"
+              class="no-suggest"
+            >
+              No suggestions
+            </li>
+          </ul>
+        </div>
+
+        <!-- Trending (optional) -->
+        <div class="panel-section" *ngIf="trending?.length">
+          <div class="section-header"><span>Trending now</span></div>
+          <div class="trending-chips">
+            <button
+              class="chip"
+              *ngFor="let t of trending"
+              (click)="onSelectTrending(t)"
+            >
+              {{ t }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-right">
+        <div class="section-header"><span>Browse</span></div>
+        <div class="categories-grid">
+          <div
+            class="cat-tile"
+            *ngFor="let c of categories"
+            (click)="onSelectCategory(c)"
+          >
+            {{ c.name }}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-
-
   <!-- Right Actions -->
   <div class="d-flex align-items-center">
-    <a routerLink="/login" class="me-3 text-white text-decoration-none"> <i class="fas fa-user text-white"></i>
-      Sign In</a>
-    <a routerLink="/cart" class="text-dark text-decoration-none"><i class="fas fa-shopping-cart text-white"></i>
+    <a routerLink="/login" class="me-3 text-white text-decoration-none">
+      <i class="fas fa-user text-white"></i> Sign In</a
+    >
+    <a routerLink="/cart" class="text-dark text-decoration-none"
+      ><i class="fas fa-shopping-cart text-white"></i>
     </a>
   </div>
 </div>
 
 <!-- Main Navigation -->
 
-<div style="width: 100%; background-color: #f8f9fa; border-bottom: 1px solid #ddd;">
+<!-- mega nav (استبدال كامل للـ nav القديم) -->
+<div
+  style="width: 100%; background-color: #f8f9fa; border-bottom: 1px solid #ddd"
+>
   <nav class="main-nav px-4">
-    <ul class="nav">
-      <li class="nav-item dropdown" *ngFor="let category of categories">
-        <a class="nav-link text-black " href="#" role="button" data-bs-toggle="dropdown"
-          style="padding-right: 10px; padding-left: 10px;">
+    <ul class="nav categories-row">
+      <li
+        class="nav-item"
+        *ngFor="let category of categories; let i = index"
+        style="position: relative"
+      >
+        <a
+          class="nav-link text-black"
+          href="javascript:void(0)"
+          (click)="openMega(i, $event)"
+          style="padding-right: 10px; padding-left: 10px"
+        >
           {{ category.name }}
         </a>
-        <ul class="dropdown-menu">
-          <li *ngFor="let sub of category.subcategories">
-            <a class="dropdown-item" href="#">{{ sub }}</a>
-          </li>
-        </ul>
+
+        <!-- mega panel: يظهر إذا openIndex === i -->
+        <div
+          class="mega-panel"
+          *ngIf="openIndex === i"
+          (click)="$event.stopPropagation()"
+        >
+          <div class="mega-inner">
+            <div class="mega-col">
+              <h6 class="mega-title">Top subcategories</h6>
+              <ul class="mega-list">
+                <li *ngFor="let subcategory of category.subcategories">
+                  <a (click)="onSelectCategory(category, subcategory)">
+                    {{ subcategory }}
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="mega-col">
+              <h6 class="mega-title">Quick links</h6>
+              <ul class="mega-list">
+                <li>
+                  <a (click)="onSelectCategory(category)"
+                    >All {{ category.name }}</a
+                  >
+                </li>
+                <li>
+                  <a
+                    (click)="onSelectCategory(category, category.subcategories?.[0] || '')"
+                  >
+                    Featured
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="mega-col right-col">
+              <h6 class="mega-title">Trending</h6>
+              <div class="mega-trending">
+                <button
+                  class="chip"
+                  *ngFor="let t of trending"
+                  (click)="onSelectTrending(t)"
+                >
+                  {{ t }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /mega panel -->
       </li>
     </ul>
   </nav>
-
 </div>
