@@ -1,7 +1,7 @@
 <!-- Corrected template to call the new validation methods -->
 <!-- Login/Register Page -->
 <div class="book-auth-container">
-  <div class="book">
+  <div class="book" [style.height]="bookHeight">
     <div class="book-page" [class.flipped]="!isLogin">
       <!-- Login Page -->
       <form (ngSubmit)="onLoginSubmit()" class="auth-form book-face">
@@ -37,6 +37,7 @@
           <input id="userName" type="text" [(ngModel)]="registerData.userName" name="userName" required (input)="validateRegisterFields()" />
           <div class="error" *ngIf="registerErrors.userName">{{ registerErrors.userName }}</div>
         </div>
+        <div class="FandLname">
         <div class="form-group">
           <label for="firstName">First Name</label>
           <input id="firstName" type="text" [(ngModel)]="registerData.firstName" name="firstName" required (input)="validateRegisterFields()" />
@@ -46,6 +47,7 @@
           <label for="lastName">Last Name</label>
           <input id="lastName" type="text" [(ngModel)]="registerData.lastName" name="lastName" required (input)="validateRegisterFields()" />
           <div class="error" *ngIf="registerErrors.lastName">{{ registerErrors.lastName }}</div>
+        </div>
         </div>
         <div class="form-group">
           <label for="nid">National ID</label>
@@ -57,6 +59,7 @@
           <input id="email" type="email" [(ngModel)]="registerData.email" name="email" required email (input)="validateRegisterFields()" />
           <div class="error" *ngIf="registerErrors.email">{{ registerErrors.email }}</div>
         </div>
+        <div class="FandLname">
         <div class="form-group password-group">
           <label for="password">Password</label>
           <div class="password-wrapper">
@@ -76,6 +79,7 @@
             </span>
           </div>
           <div class="error" *ngIf="registerErrors.confirmPassword">{{ registerErrors.confirmPassword }}</div>
+        </div>
         </div>
         <button type="submit" class="btn">Register</button>
         <div class="switch-link">

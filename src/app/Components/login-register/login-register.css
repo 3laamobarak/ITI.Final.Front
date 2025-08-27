@@ -12,7 +12,7 @@
 .book {
   perspective: 1500px;
   width: 600px;
-  height: 450px;
+  /*height: 450px;*/
   position: relative;
   margin: 0 auto;
 }
@@ -75,6 +75,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  width: -webkit-fill-available;
 }
 
 .form-group label {
@@ -84,6 +85,7 @@
 }
 
 .form-group input {
+  width: 100%;
   padding: 12px;
   border-radius: 10px;
   border: 1px solid #cbd5e0;
@@ -178,7 +180,12 @@
   color: #3b5998;
   text-decoration: underline;
 }
-
+.FandLname
+{
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+}
 /* Animations */
 @keyframes fadeIn {
   from {

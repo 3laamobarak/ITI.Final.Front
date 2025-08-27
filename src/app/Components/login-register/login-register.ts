@@ -4,6 +4,7 @@ import { User } from '../../Services/user';
 import { CommonModule } from '@angular/common'; // Import CommonModule for *ngIf
 import { FormsModule } from '@angular/forms'; // Import FormsModule for ngModel
 import { Iuser } from '../../Models/iuser';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login-register',
@@ -14,6 +15,7 @@ import { Iuser } from '../../Models/iuser';
 })
 export class LoginRegister {
   isLogin = true;
+  bookHeight = '450px';
 
   showLoginPassword = false;
   showRegisterPassword = false;
@@ -39,7 +41,7 @@ export class LoginRegister {
   errorMsg = '';
   successMsg = '';
 
-  constructor(private auth: Auth, private user: User) {}
+  constructor(private auth: Auth, private user: User , private router: Router) {}
 
   toggleForm(isLogin: boolean) {
     this.isLogin = isLogin;
@@ -47,6 +49,7 @@ export class LoginRegister {
     this.successMsg = '';
     this.loginErrors = {};
     this.registerErrors = {};
+    this.bookHeight = isLogin ? '450px' : '750px';
   }
 
   // New method to validate all login fields at once
@@ -146,6 +149,14 @@ export class LoginRegister {
       this.auth.register(body as any).subscribe({
         next: (res) => {
           this.successMsg = 'Registration successful!';
+          sessionStorage.setItem('verify_email', this.registerData.email);
+          // call the setToken method to store the token
+          this.user.setToken(res.token);
+
+
+          console.log('Registration successful, token received:', res.token);
+
+          this.router.navigate(['/verify-email']);
           this.toggleForm(true);
         },
         error: (err) => {

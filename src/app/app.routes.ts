@@ -5,6 +5,7 @@ import { ProductList } from './Components/products/product-list/product-list';
 
 import { ProductDetails } from './Components/products/product-details/product-details';
 import { LoginRegister } from './Components/login-register/login-register';
+import { VerifyEmail } from './Components/verify-email/verify-email';
 
 export const routes: Routes = [
 
@@ -13,9 +14,10 @@ export const routes: Routes = [
     {path: 'productsList' , component: ProductList},
     { path: 'product/:id', component: ProductDetails },
     {path: 'NotFound' , component: NotFound},
-    {path: 'login-register' , component: LoginRegister}, // Add this line
+    {path: 'login-register' , component: LoginRegister},
+    {path: 'verify-email' , component: VerifyEmail},
     
-    
+
     {path: '**', redirectTo: '/NotFound'}
    
 ];
