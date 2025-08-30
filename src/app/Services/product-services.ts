@@ -19,7 +19,8 @@
     }
 
 
-    getProductById(id: string): Observable<IProduct> {
+
+    getProductById(id: number): Observable<IProduct> {
       return this.http.get<IProduct>(`${this.apiUrl}/Products/${id}`);
     }
     

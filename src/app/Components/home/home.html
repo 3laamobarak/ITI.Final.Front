@@ -27,7 +27,7 @@
 
 
 
-<!-- Slider -->
+<!-- Slider fot best sellers -->
 
 <section class="my-1 p-3">
   <div class="best-sellers-header">
@@ -35,6 +35,21 @@
   <a routerLink="/productsList">See All products</a>
 </div>
 
+  <app-product-slider [products]="products"></app-product-slider>
+</section>
+
+
+<!-- slider for new arrivals -->
+
+<section class="my-1 p-3">
+  <h3 class="mb-4">New Arrivals</h3>
+  <app-product-slider [products]="products"></app-product-slider>
+</section>
+
+<!-- slider for trending now -->
+
+<section class="my-1 p-3">
+  <h3 class="mb-4">Trending Now</h3>
   <app-product-slider [products]="products"></app-product-slider>
 </section>
 

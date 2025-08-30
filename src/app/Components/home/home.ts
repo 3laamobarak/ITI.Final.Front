@@ -14,7 +14,11 @@ import { RouterLink } from '@angular/router';
   styleUrl: './home.css',
 })
 export class Home implements OnInit {
+
   products: IProduct[] = [];
+
+  // newArrivals
+  newArrivals: IProduct[] = [];
 
   categories: ICategory[] = [];
 
@@ -25,9 +29,27 @@ export class Home implements OnInit {
   ) {}
   ngOnInit(): void {
     this.productServices.getAllProducts().subscribe({
-      next: (data) => (this.products = data),
+      next: (data) => {
 
-      complete: () => this.cd.detectChanges(),
+        // all products
+        this.products = data;
+        
+        // new arrivals
+        this.newArrivals = [...this.products]
+        .sort((a, b) =>
+          new Date(b.CreatedAt).getTime() - new Date(a.CreatedAt).getTime())
+        .slice(0, 6);
+
+        // trending products
+        this.products = [...this.products]
+        .sort((a, b) => b.QuantitySold - a.QuantitySold)
+        .slice(0, 6);
+
+        this.cd.detectChanges();
+
+      },
+
+      
 
       error: (err) => console.error('Error:', err),
     });
