@@ -3,9 +3,8 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ICategory } from '../../Models/icategory';
 import { CategoryServices } from '../../Services/category-services';
 import { RouterLink } from '@angular/router';
-import { Router } from '@angular/router';  
-
-
+import { Router } from '@angular/router'; 
+import { CartServices } from '../../Services/cart-services';
 @Component({
   selector: 'app-header',
   imports: [CommonModule, RouterLink],
@@ -14,19 +13,26 @@ import { Router } from '@angular/router';
 })
 export class Header implements OnInit {
   categories: ICategory[] = [];
-
+  cartCount = 0;
   constructor(
     private categoryServices: CategoryServices,
     private cd: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private cartService: CartServices
   ) {}
 
-  ngOnInit(): void {
-    this.categoryServices.getAllCategories().subscribe((data) => {
-      this.categories = data;
-      this.cd.detectChanges();
-    });
-  }
+ngOnInit(): void {
+  this.categoryServices.getAllCategories().subscribe(data => {
+    this.categories = data;
+    this.cd.detectChanges();
+  });
+
+
+  this.cartService.getCartCount().subscribe(count => {
+    this.cartCount = count;
+    this.cd.detectChanges(); 
+  });
+}
 
   onSearch(value: string | null | undefined) {
     const term = (value || '').trim();

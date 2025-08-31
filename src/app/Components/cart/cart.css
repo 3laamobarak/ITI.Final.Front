@@ -1,0 +1,118 @@
+/* Container styling */
+.h-custom {
+  min-height: 100vh;
+}
+
+/* Card */
+.card {
+  border-radius: 16px;
+  border: none;
+  background: #ffffff;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* Header */
+.header h2 {
+  color: #28a745;
+}
+
+/* Cart Item Hover */
+.cart-item {
+  transition: background-color 0.25s ease, transform 0.15s ease;
+  border-radius: 12px;
+}
+.cart-item:hover {
+  background-color: #f0fdf4; /* أخضر فاتح جدا */
+  transform: scale(1.01);
+}
+
+/* Quantity Controls */
+.quantity-control .btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border-color: #28a745;
+  color: #28a745;
+}
+.quantity-control .btn:hover {
+  background-color: #28a745;
+  color: #fff;
+}
+.quantity-control .form-control {
+  height: 36px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid #28a7453d;
+}
+
+/* Prices */
+.item-price {
+  color: #198754;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #20c997, #28a745);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
+}
+
+/* Badge */
+.badge.bg-primary {
+  background-color: #28a745 !important;
+  font-size: 0.9rem;
+  padding: 0.6em 1em;
+  border-radius: 30px;
+}
+
+/* Checkout Total */
+.total-section {
+  background: #f9fdf9;
+  border-radius: 12px;
+  padding: 1rem;
+}
+.final-total span {
+  color: #28a745;
+}
+
+/* Placeholder Loading */
+.placeholder {
+  background-color: #e6f4ea;
+}
+.placeholder-glow .placeholder {
+  animation: placeholder-glow-green 2s ease-in-out infinite;
+}
+@keyframes placeholder-glow-green {
+  0% { background-color: #d1f2d7; }
+  50% { background-color: #b8e9c0; }
+  100% { background-color: #d1f2d7; }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .col-lg-7, .col-lg-5 {
+    margin-bottom: 2rem;
+  }
+  .quantity-control .form-control {
+    width: 45px;
+  }
+  .btn-primary {
+    font-size: 1rem;
+  }
+}

@@ -1,7 +1,7 @@
   import { Injectable } from '@angular/core';
   import { IProduct } from '../Models/iproduct';
   import { Observable } from 'rxjs';
-  import { HttpClient } from '@angular/common/http';
+  import { HttpClient ,HttpHeaders } from '@angular/common/http';
   import { environment } from '../../environments/environment';
 
   @Injectable({
@@ -19,8 +19,13 @@
     }
 
 
-    getProductById(id: string): Observable<IProduct> {
-      return this.http.get<IProduct>(`${this.apiUrl}/Products/${id}`);
-    }
+  getProductById(id: string): Observable<IProduct> {
+    const token = localStorage.getItem('token'); 
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.get<IProduct>(`${this.apiUrl}/Products/${id}`, { headers });
+  }
     
   }

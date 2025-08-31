@@ -51,8 +51,15 @@
   <div class="d-flex align-items-center">
     <a routerLink="/login" class="me-3 text-white text-decoration-none"> <i class="fas fa-user text-white"></i>
       Sign In</a>
-    <a routerLink="/cart" class="text-dark text-decoration-none"><i class="fas fa-shopping-cart text-white"></i>
-    </a>
+<a routerLink="/cart" class="position-relative text-dark text-decoration-none">
+  <i class="fas fa-shopping-cart text-white"></i>
+  <span 
+    *ngIf="cartCount > 0" 
+    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+    {{ cartCount }}
+  </span>
+</a>
+
   </div>
 </div>
 
