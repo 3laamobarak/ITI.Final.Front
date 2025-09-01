@@ -270,6 +270,12 @@ export class Header implements OnInit, OnDestroy, AfterViewChecked {
     this.searchHistory.unshift(t);
     if (this.searchHistory.length > 10) this.searchHistory.length = 10;
     localStorage.setItem(this.historyKey, JSON.stringify(this.searchHistory));
+///=======
+    // navigate to product-list with query param 'search'
+    
+    this.router.navigate(['productsList'], {
+      queryParams: { search: term },
+    });
   }
 
   clearHistory() {

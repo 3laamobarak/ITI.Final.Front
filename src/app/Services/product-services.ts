@@ -43,5 +43,10 @@ export class ProductServices {
   }
   getCategories(): Observable<ICategorySmall[]> {
     return this.http.get<ICategorySmall[]>(`${this.apiUrl}/Category`); // غيّري لو endpoint مختلف
+
+    getProductById(id: number): Observable<IProduct> {
+      return this.http.get<IProduct>(`${this.apiUrl}/Products/${id}`);
+    }
+    
   }
 }
