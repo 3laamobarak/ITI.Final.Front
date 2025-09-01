@@ -7,13 +7,14 @@ import { ProductDetails } from './Components/products/product-details/product-de
 import {Cart} from './Components/cart/cart';
 import { CheckoutComponent } from './Components/checkout/checkout';
 import { OrderConfirmationComponent } from './Components/order-confirmation/order-confirmation';
+import { LoginRegister } from './Components/login-register/login-register';
+import { VerifyEmail } from './Components/verify-email/verify-email';
+import {noAuthGuard} from './Guards/no-auth-guard';
 
 export const routes: Routes = [
 
     { path: '', redirectTo: '/home', pathMatch: 'full' },
-
-    {path: 'home' , component: Home},
-
+    {path: 'home' , component: Home , title: 'Home'},
     {path: 'productsList' , component: ProductList},
 
 
@@ -23,8 +24,11 @@ export const routes: Routes = [
      { path: 'checkout', component: CheckoutComponent },
   { path: 'order-confirmation', component: OrderConfirmationComponent },
 
+
     {path: 'NotFound' , component: NotFound},
+    {path: 'login-register' , component: LoginRegister , title: 'Login / Register' , canActivate: [noAuthGuard]},
+    {path: 'verify-email' , component: VerifyEmail , title: 'Verify Email' , canActivate: [noAuthGuard]},
 
     {path: '**', redirectTo: '/NotFound'}
-   
+
 ];

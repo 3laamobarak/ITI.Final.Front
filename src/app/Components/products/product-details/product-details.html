@@ -1,133 +1,162 @@
-<!-- Product Page Layout -->
-<section *ngIf="!loading && product" class="product-page my-5">
-  <!-- ====== Gallery ====== -->
-  <div class="gallery">
+  <!-- ✅ Loading Spinner -->
+  <div *ngIf="loading" class="spinner">
+    <div class="loader"></div>
+    <p>Loading product details...</p>
+  </div>
 
-      <!-- main image -->
-    <div class="main-image">
-      <img [src]="galleryImages[activeImageIndex]" [alt]="product.name">
-    </div>
+
+
+  <!-- Product Page Layout -->
+  <section *ngIf="!loading && product" class="product-page my-5">
+    <!-- ====== Gallery ====== -->
+    <div class="gallery">
+
+        <!-- main image -->
+      <div class="main-image">
+        <img [src]="galleryImages[activeImageIndex]" [alt]="product.name">
+      </div>
+      
+      <!-- thumbnails -->
+      <div class="thumbs">
+        <img *ngFor="let img of galleryImages; let i = index"
+            [src]="img"
+            [class.active]="i === activeImageIndex"
+            (click)="activeImageIndex = i">
+      </div>
+
     
-    <!-- thumbnails -->
-    <div class="thumbs">
-      <img *ngFor="let img of galleryImages; let i = index"
-           [src]="img"
-           [class.active]="i === activeImageIndex"
-           (click)="activeImageIndex = i">
     </div>
 
-  
+    <!-- ====== Product Details ====== -->
+    <div class="details">
+      <h1 class="name">{{ product.name }}</h1>
+      <div class="rating" [innerHTML]="getStars(product.averageRating ?? 0)"></div>
+      <div class="stock" [class.in-stock]="product.stockQuantity">
+        {{ product.stockQuantity ? 'In Stock' : 'Out of Stock' }}
+      </div>
+
+      <div class="description">
+        <ul>
+          <li><strong>100% authentic</strong></li>
+          <li><strong>Best by:</strong> 05/2029</li>
+          <li><strong>First available:</strong> 05/2007</li>
+          <li><strong>Shipping weight:</strong> 0.26 kg</li>
+          <li><strong>Product code:</strong> NOW-00035</li>
+          <li><strong>UPC:</strong> 733739000354</li>
+          <li><strong>Package quantity:</strong> 120 Count</li>
+          <li><strong>Dimensions:</strong> 11.9 x 6.9 x 6.9 cm, 0.26 kg</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ====== Buy Box ====== -->
+    <div class="buy-box">
+      <div class="price-line">
+        <span class="price">{{ product.price | currency:'EGP' }}</span> <br>
+        <span class="per-serving" *ngIf="product.price">
+          ({{ product.price | currency:'EGP' }}/serving)
+        </span>
+      </div>
+
+      <div class="quantity ">
+        <button (click)="decreaseQty()">-</button>
+        <input type="number" [(ngModel)]="qty" min="1">
+        <button (click)="increaseQty()">+</button>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" (click)="addToCart(product, qty)" [disabled]="!product.stockQuantity">
+          <!-- cart icon -->
+          <i class="fas fa-shopping-cart"></i>
+          Add to Cart
+        </button>
+      </div>
+
+      <div class="add-to-lists">
+        <button class="btn secondary" (click)="addToWishlist(product)">
+          <!-- heart icon -->
+          <i class="fas fa-heart"></i>
+          Add to Wishlist
+        </button>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- customer also viewed section -->
+  <section class="also-viewed">
+    <h5 class="ms-5">Customers Also Viewed</h5> 
+    <!-- product slider component  -->
+    <app-product-slider class="p-5" [products]="productsAlsoViewed"></app-product-slider>
+  </section>
+
+
+  <!-- product overview -->
+ <div class="product-overview">
+    <div class="product-header">Product overview</div>
+    <div class="overview-grid">
+      
+      <!-- Left Column -->
+      <div>
+        <div class="section">
+          <h4>Description</h4>
+          <p>- {{product?.description}}</p>
+          <p>- Molecularly Distilled</p>
+          <p>- Eye & Immune Health</p>
+          <p>- Dietary Supplement</p>
+          <p>- Gluten Free</p>
+          <p>Bluebonnet’s Vitamin A 3000 mcg (10,000 IU) Softgels are formulated with vitamin A from molecularly distilled, deep sea, cold water fish liver oil to help support eye health and immune function.</p>
+        </div>
+
+        <div class="section">
+          <h4>Suggested use</h4>
+          <p> {{product?.SuggestedUse}}As a dietary supplement, take one softgel daily, preferably with a meal or as directed by a healthcare practitioner.</p>
+        </div>
+
+        <div class="section">
+          <h4>Warnings</h4>
+          <p>Store tightly closed in a cool, dry place. {{product?.Warnings}}</p>
+          <p>For adults only. Consult physician if pregnant/nursing, taking medication, or have a medical condition. Keep out of reach of children.</p>
+        </div>
+
+        <div class="section disclaimer">
+          <h4>Disclaimer</h4>
+          <p> {{product?.Disclaimer}}While iHerb strives to ensure the accuracy of its product images and information, some manufacturing changes to packaging and/or ingredients may be pending update on our site. Although items may occasionally ship with alternate packaging, freshness is always guaranteed. We recommend that you read labels, warnings and directions of all products before use and not rely solely on the information provided by iHerb.</p>
+        </div>
+
+        <div class="link">
+          <a href="#">Visit manufacturer's website</a>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div>
+        <div class="supplement-facts">
+          <h4>Supplement facts</h4>
+          <table class="supplement-table">
+            <tr>
+              <th colspan="2">Serving Size: 1 Softgel</th>
+            </tr>
+            <tr>
+              <th colspan="2">Servings per Container: 100</th>
+            </tr>
+            <tr>
+              <th>Amount Per Serving</th>
+              <th>% Daily Value</th>
+            </tr>
+            <tr>
+              <td>Vitamin A (from 10,000 IU fish liver oil) 3000 mcg</td>
+              <td>333%</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+    </div>
   </div>
 
-  <!-- ====== Product Details ====== -->
-  <div class="details">
-    <h1 class="name">{{ product.name }}</h1>
-    <div class="rating" [innerHTML]="getStars(product.averageRating ?? 0)"></div>
-    <div class="stock" [class.in-stock]="product.stockQuantity">
-      {{ product.stockQuantity ? 'In Stock' : 'Out of Stock' }}
-    </div>
-
-    <div class="description">
-      <div [innerHTML]="product.description"></div>
-      <ul>
-        <li><strong>100% authentic</strong></li>
-        <li><strong>Best by:</strong> 05/2029</li>
-        <li><strong>First available:</strong> 05/2007</li>
-        <li><strong>Shipping weight:</strong> 0.26 kg</li>
-        <li><strong>Product code:</strong> NOW-00035</li>
-        <li><strong>UPC:</strong> 733739000354</li>
-        <li><strong>Package quantity:</strong> 120 Count</li>
-        <li><strong>Dimensions:</strong> 11.9 x 6.9 x 6.9 cm, 0.26 kg</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- ====== Buy Box ====== -->
-  <div class="buy-box">
-    <div class="price-line">
-      <span class="price">{{ product.price | currency:'EGP' }}</span> <br>
-      <span class="per-serving" *ngIf="product.price">
-        ({{ product.price | currency:'EGP' }}/serving)
-      </span>
-    </div>
-
-    <div class="quantity ">
-      <button (click)="decreaseQty()">-</button>
-      <input type="number" [(ngModel)]="qty" min="1">
-      <button (click)="increaseQty()">+</button>
-    </div>
-
-    <div class="actions">
-      <button class="btn primary" (click)="addToCart(product, qty)" [disabled]="!product.stockQuantity">
-        <!-- cart icon -->
-        <i class="fas fa-shopping-cart"></i>
-        Add to Cart
-      </button>
-    </div>
-
-    <div class="add-to-lists">
-      <button class="btn secondary" (click)="addToWishlist(product)">
-        <!-- heart icon -->
-        <i class="fas fa-heart"></i>
-        Add to Wishlist
-      </button>
-    </div>
-  </div>
-</section>
-
-
-<!-- customer also viewed section -->
-<section class="also-viewed">
-  <h3 class="mb-1">Customers Also Viewed</h3> 
-  <!-- product slider component  -->
-  <app-product-slider [products]="productsAlsoViewed"></app-product-slider>
-</section>
-
-
-<!-- product overview -->
- <div class="m-5">
-  <h3>
-    Product Overview
-  </h3>
-  <p>{{product.description}}</p>
-  <p>Amino Acids
-Conditionally Essential Amino Acid
-Nitric Oxide Precursor
-Non-GMO
-A Dietary Supplement 
-Vegetarian/Vegan
-Kosher
-Family Owned Since 1968
-GMP Quality Assured
-Arginine is a conditionally essential basic amino acid involved primarily in urea metabolism and excretion, as well as in DNA synthesis and protein production. It is an important precursor of nitric oxide (NO) and thus plays a role in the dilation of blood vessels.
-
-Suggested use
-Take 1 tablet twice daily as needed. Take between meals or at bedtime with at least 8 oz. of water or juice to facilitate absorption. 
-
-Other ingredients
-Hydroxypropyl cellulose, microcrystalline cellulose, stearic acid (vegetable source), croscarmellose sodium, silicon dioxide and vegetarian coating.
-
-Not manufactured with wheat, gluten, soy, milk, egg, fish, shellfish or tree nut ingredients. Produced in a GMP facility that processes other ingredients containing these allergens.
-
-This product has twice the L-Arginine (1,000 mg per tablet) as in our regular strength product (500 mg per capsule). 
-
-The L-Arginine used in this product is pharmaceutical grade.
-
-Warnings
-Store in a cool, dry place after opening.
-
-Take this product with at least 8 oz. of water or juice. For adults only. Not for pregnant or nursing women. Consult physician if taking medication (especially antihypertensives, anticoagulants, and antidiabetic drugs), have a medical condition (especially asthma or renal disease) or are planning to have surgery. This product should be avoided by persons with glaucoma or herpes simplex unless otherwise prescribed by a physician. 
-
-Do not use if you have a myocardial infarction or have established coronary artery disease. Keep out of reach of children. 
-
-Natural color variation may occur in this product.
-
-Disclaimer
-While iHerb strives to ensure the accuracy of its product images and information, some manufacturing changes to packaging and/or ingredients may be pending update on our site. Although items may occasionally ship with alternate packaging, freshness is always guaranteed. We recommend that you read labels, warnings and directions of all products before use and not rely solely on the information provided by iHerb.</p>
- </div>
-
- <!-- Questions and answers -->
- <section class="m-5">
-  <h3>Questions and Answers</h3>
- </section>
+  <!-- Questions and answers -->
+  <section class="m-5">
+    <h3>Questions and Answers</h3>
+  </section>
 

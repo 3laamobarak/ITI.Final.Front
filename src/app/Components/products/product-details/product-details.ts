@@ -9,22 +9,17 @@ import {CartServices} from '../../../Services/cart-services';
 
 @Component({
   selector: 'app-product-details',
-  imports: [CommonModule, FormsModule , ProductSlider],
+  imports: [CommonModule, FormsModule, ProductSlider],
   templateUrl: './product-details.html',
-  styleUrl: './product-details.css',
+  styleUrls: ['./product-details.css'],
 })
 export class ProductDetails implements OnInit {
-
-
   productsAlsoViewed: IProduct[] = [];
-  product!: IProduct;
+  product: IProduct | null = null;
   loading = true;
   qty = 1;
   activeImageIndex = 0;
-
   galleryImages: string[] = [];
-
- 
 
   constructor(
     private route: ActivatedRoute,
@@ -34,34 +29,46 @@ export class ProductDetails implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+
     if (id) {
       this.productService.getProductById(id).subscribe({
         next: (data) => {
+          console.log('Product loaded:', data);
           this.product = data;
 
           this.galleryImages = [
+           
             'https://cloudinary.images-iherb.com/image/upload/f_auto,q_auto:eco/images/now/now00035/g/32.jpg',
+              ...(data.imageUrl ? [data.imageUrl] : []), 
             'https://cloudinary.images-iherb.com/image/upload/f_auto,q_auto:eco/images/now/now00035/s/43.jpg',
             'https://cloudinary.images-iherb.com/image/upload/w_75/f_auto,q_auto:eco/images/cms/banners/dPDP_Authenticity_Graphic2_2025_009en-us.jpg',
             'https://cloudinary.images-iherb.com/image/upload/f_auto,q_auto:eco/images/now/now00035/s/38.jpg',
           ];
 
+          this.activeImageIndex = 0;
+          this.loading = false;
+          this.cd.detectChanges(); 
+        },
+        error: (err) => {
+          console.error('Error loading product:', err);
           this.loading = false;
         },
-        complete: () => this.cd.detectChanges(),
-
-        error: () => (this.loading = false),
       });
     }
+
+    
     this.productService.getAllProducts().subscribe((data) => {
-      this.productsAlsoViewed = data;
+      
+      if (this.product){
+                this.productsAlsoViewed = data.filter((p) => p.brandId !== this.product?.brandId );
+      }
+      else{
+        this.productsAlsoViewed = data;
+      }
+     
       this.cd.detectChanges();
     });
-
-    if (this.product) {
-      this.activeImageIndex = 0;
-    }
   }
 
   increaseQty() {
@@ -79,16 +86,15 @@ this.cartService.addToCart(this.product.id, qty).subscribe({
     console.error('Failed to add the product to the cart', err);
   }
 });
+
   }
 
   getStars(rating: number): string {
-
     let fullStars = Math.floor(rating);
     let halfStar = rating % 1 >= 0.5 ? 1 : 0;
     let emptyStars = 5 - fullStars - halfStar;
 
     let starsHtml = '';
-
     for (let i = 0; i < fullStars; i++) {
       starsHtml += `<i class="bi bi-star-fill text-warning"></i>`;
     }
@@ -98,16 +104,11 @@ this.cartService.addToCart(this.product.id, qty).subscribe({
     for (let i = 0; i < emptyStars; i++) {
       starsHtml += `<i class="bi bi-star text-warning"></i>`;
     }
-
     return starsHtml;
   }
 
-  addToWishlist(product: any): void {
-   
-    // check if wishlist exists in local storage
+  addToWishlist(product: IProduct): void {
     let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-
-    // check if product already exists in wishlist
     let exists = wishlist.find((item: any) => item.id === product.id);
 
     if (!exists) {
