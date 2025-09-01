@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-
 import { RouterModule } from '@angular/router';
+import {CartServices} from '../../../Services/cart-services';
 
 @Component({
   selector: 'app-product-card',
@@ -12,11 +12,12 @@ import { RouterModule } from '@angular/router';
 export class ProductCard {
 
     @Input() product: any;
+    userId: string | null = null;
 
-    constructor() {}
+    constructor(private cartService: CartServices) {}
 
 
-    getStars(rating: number): string {
+  getStars(rating: number): string {
   let fullStars = Math.floor(rating);
   let halfStar = rating % 1 >= 0.5 ? 1 : 0;
   let emptyStars = 5 - fullStars - halfStar;
@@ -34,6 +35,17 @@ export class ProductCard {
   }
 
   return starsHtml;
-}
 
+  
+}
+addToCart() {
+this.cartService.addToCart(this.product.id, 1).subscribe({
+  next: () => {
+    console.log(`${this.product.name} has been added to the cart `);
+  },
+  error: (err) => {
+    console.error('Failed to add the product to the cart ', err);
+  }
+});
+  }
 }

@@ -5,6 +5,7 @@ import { ProductServices } from '../../../Services/product-services';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductSlider } from '../product-slider/product-slider';
+import {CartServices} from '../../../Services/cart-services';
 
 @Component({
   selector: 'app-product-details',
@@ -23,7 +24,8 @@ export class ProductDetails implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private productService: ProductServices,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private cartService: CartServices
   ) {}
 
   ngOnInit(): void {
@@ -76,7 +78,15 @@ export class ProductDetails implements OnInit {
     if (this.qty > 1) this.qty--;
   }
   addToCart(product: IProduct, qty: number) {
-    console.log('Add to cart', product, qty);
+this.cartService.addToCart(this.product.id, qty).subscribe({
+  next: () => {
+    console.log(`${this.product.name} has been added to the cart `);
+  },
+  error: (err) => {
+    console.error('Failed to add the product to the cart', err);
+  }
+});
+
   }
 
   getStars(rating: number): string {
