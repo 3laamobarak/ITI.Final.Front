@@ -1,0 +1,25 @@
+<div class="verify-email-container">
+  <div class="verify-accent"></div>
+  <div class="verify-content">
+    <h2>Verify Email</h2>
+    <p>Please enter the 6-digit code sent to your email:<br><b>{{ email }}</b></p>
+    <div class="otp-boxes">
+      <input
+        *ngFor="let i of [0,1,2,3,4,5]; let idx = index"
+        class="otp-input-box"
+        type="text"
+        maxlength="1"
+        pattern="[0-9]*"
+        [value]="otp[idx] || ''"
+        (input)="onOtpInput($event, idx)"
+        (keydown)="onOtpKeydown($event, idx)"
+        autocomplete="one-time-code"
+      />
+    </div>
+    <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+    <div *ngIf="successMsg" class="success">{{ successMsg }}</div>
+    <button type="button" (click)="verifyEmail()">Verify Email</button>
+    <a href="#" (click)="resendCode($event)">Resend Code</a>
+<!--    <a href="#" (click)="changeEmail($event)">Change Email</a>-->
+  </div>
+</div>

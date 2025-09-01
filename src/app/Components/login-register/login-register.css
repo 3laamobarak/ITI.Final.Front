@@ -1,0 +1,210 @@
+/* Book Auth Container */
+.book-auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #d4e4ff 0%, #e9d4ff 100%);
+  padding: 20px;
+}
+
+/* Book Styling */
+.book {
+  perspective: 1500px;
+  width: 600px;
+  /*height: 450px;*/
+  position: relative;
+  margin: 0 auto;
+}
+
+.book-page {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  transition: transform 1s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform-style: preserve-3d;
+  transform-origin: left center;
+}
+
+.book-page.flipped {
+  transform: rotateY(-180deg);
+}
+
+/* Auth Form Styling */
+.auth-form {
+  width: 100%;
+  height: 100%;
+  padding: 40px;
+  box-sizing: border-box;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(50, 50, 100, 0.2);
+  position: absolute;
+  top: 0;
+  left: 0;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+  animation: fadeIn 1.2s ease-out;
+}
+
+.book-face {
+  z-index: 2;
+}
+
+.book-back {
+  transform: rotateY(180deg);
+  z-index: 1;
+}
+
+/* Typography */
+.auth-form h2 {
+  text-align: center;
+  margin-bottom: 12px;
+  color: #3b5998;
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Form Group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: -webkit-fill-available;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 0.95rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e0;
+  font-size: 1rem;
+  background: #f7fafc;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+  border-color: #5a67d8;
+  background: #edf2ff;
+  box-shadow: 0 0 8px rgba(90, 103, 216, 0.2);
+  outline: none;
+}
+
+/* Form Row */
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+/* Password Group */
+.password-group .password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #5a67d8;
+  font-size: 1.3rem;
+  transition: color 0.3s ease;
+}
+
+.eye-icon:hover {
+  color: #3b5998;
+}
+
+/* Button Styling */
+.btn {
+  background: linear-gradient(90deg, #5a67d8 0%, #7f9cf5 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(90, 103, 216, 0.3);
+}
+
+.btn:hover {
+  background: linear-gradient(90deg, #7f9cf5 0%, #5a67d8 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(90, 103, 216, 0.4);
+}
+
+/* Error Messages */
+.error {
+  color: #e53e3e;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+/* Switch Link */
+.switch-link {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 1rem;
+  color: #2d3748;
+}
+
+.switch-link a {
+  color: #5a67d8;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.switch-link a:hover {
+  color: #3b5998;
+  text-decoration: underline;
+}
+.FandLname
+{
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+}
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
