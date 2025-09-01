@@ -33,7 +33,7 @@ export class Header implements OnInit {
     if (!term) return;
 
     // navigate to product-list with query param 'search'
-    // استخدمي المسار الفعلي عندك، هنا مثال: '/products/product-list'
+    
     this.router.navigate(['productsList'], {
       queryParams: { search: term },
     });
