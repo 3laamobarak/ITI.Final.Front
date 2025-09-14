@@ -1,12 +1,32 @@
 <div class="container py-5">
   <div class="order-confirmation-card text-center p-5 mx-auto">
     <div class="icon-circle mb-4">
-      <i class="fas fa-check-circle"></i>
+      <i class="fas" [ngClass]="{
+        'fa-check-circle text-success': paymentStatus === 'success',
+        'fa-times-circle text-danger': paymentStatus === 'failed',
+        'fa-hourglass-half text-warning': paymentStatus === 'pending'
+      }"></i>
     </div>
-    <h2 class="fw-bold text-success mb-2">Order Confirmed!</h2>
-    <p class="text-muted mb-4">Thank you for your purchase. Your order has been successfully placed.</p>
 
-    <div class="order-details text-start">
+    <h2 class="fw-bold mb-2" [ngClass]="{
+      'text-success': paymentStatus === 'success',
+      'text-danger': paymentStatus === 'failed',
+      'text-warning': paymentStatus === 'pending'
+    }">
+      {{ paymentStatus === 'success' ? 'Order Confirmed!' :
+         paymentStatus === 'failed' ? 'Payment Failed!' :
+         'Processing Payment...' }}
+    </h2>
+
+    <p class="text-muted mb-4">
+      {{ paymentStatus === 'success' ? 
+         'Thank you for your purchase. Your order has been successfully placed.' :
+         paymentStatus === 'failed' ?
+         'Your payment could not be processed. Please try again.' :
+         'Your payment is being processed. Please wait...' }}
+    </p>
+
+    <div class="order-details text-start" *ngIf="paymentStatus === 'success'">
       <h4 class="mb-3 border-bottom pb-2">Order Summary</h4>
       <p><strong>Order ID:</strong> {{ orderDetails.orderId || 'N/A' }}</p>
       <p><strong>Total:</strong> ${{ orderDetails.total ? (orderDetails.total | number:'1.2-2') : 'N/A' }}</p>
