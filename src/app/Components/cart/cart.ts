@@ -5,7 +5,8 @@ import { CartItem } from '../../Models/ICartItem';
 import { forkJoin } from 'rxjs';
 import { DecimalPipe,CommonModule } from '@angular/common';
 import { ChangeDetectorRef } from '@angular/core';
-  import{RouterLink} from '@angular/router';
+import{RouterLink} from '@angular/router';
+
 @Component({
   imports: [DecimalPipe, CommonModule,RouterLink],
   selector: 'app-cart',
@@ -15,6 +16,7 @@ import { ChangeDetectorRef } from '@angular/core';
 export class Cart implements OnInit {
   cartItems: CartItem[] = [];
   total: number = 0;
+  loading = true;
 
   constructor(
     private cartService: CartServices,
@@ -24,37 +26,42 @@ export class Cart implements OnInit {
 
   ngOnInit() {
     this.loadCart();
-    
   }
 
-  loading = true;
+  loadCart() {
+    this.loading = true;
+    this.cartService.getCartItems().subscribe({
+      next: (items: CartItem[]) => {
+        const requests = items.map(item =>
+          this.productService.getProductById(item.productId.toString())
+        );
 
-loadCart() {
-  this.loading = false;
-  this.cartService.getCartItems().subscribe({
-    next: (items: CartItem[]) => {
-      const requests = items.map(item =>
-        this.productService.getProductById(item.productId.toString())
-      );
+        if (requests.length === 0) {
+          this.cartItems = [];
+          this.updateTotal();
+          this.loading = false;
+          return;
+        }
 
-      forkJoin(requests).subscribe((products: any[]) => {
-        this.cartItems = items.map((item, index) => ({
-          ...item,
-          name: products[index].name,
-          description: products[index].description,
-          price: products[index].price
-        }));
-        this.updateTotal();
+        forkJoin(requests).subscribe((products: any[]) => {
+          this.cartItems = items.map((item, index) => ({
+            ...item,
+            name: products[index].name,
+            description: products[index].description,
+            price: products[index].price
+          }));
+          this.updateTotal();
+          this.loading = false; 
+          this.cdr.detectChanges();
+        });
+      },
+      error: (err) => {
+        console.error("Error loading cart:", err);
         this.loading = false; 
-        this.cdr.detectChanges();
-      });
-    },
-    error: (err) => {
-      console.error(err);
-      this.loading = false; 
-    }
-  });
-}
+      }
+    });
+  }
+
   updateTotal() {
     this.total = this.cartItems.reduce(
       (sum, item) => sum + (item.price * item.quantity), 0
@@ -62,31 +69,75 @@ loadCart() {
   }
 
   increaseQuantity(item: CartItem) {
-    item.quantity++;
-    this.updateTotal();
+    this.loading = true;
+    const newQuantity = item.quantity + 1;
+    
+    this.cartService.updateQuantity(item.cartItemId, newQuantity).subscribe({
+      next: () => {
+        item.quantity = newQuantity;
+        this.updateTotal();
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error("Error updating quantity:", err);
+        this.loading = false;
+        this.loadCart(); // Reload cart to ensure UI is in sync with backend
+      }
+    });
   }
 
   decreaseQuantity(item: CartItem) {
-    if (item.quantity > 1) item.quantity--;
-    this.updateTotal();
+    if (item.quantity <= 1) return;
+    
+    this.loading = true;
+    const newQuantity = item.quantity - 1;
+    
+    this.cartService.updateQuantity(item.cartItemId, newQuantity).subscribe({
+      next: () => {
+        item.quantity = newQuantity;
+        this.updateTotal();
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error("Error updating quantity:", err);
+        this.loading = false;
+        this.loadCart(); // Reload cart to ensure UI is in sync with backend
+      }
+    });
   }
 
+  removeItem(cartItemId: number) {
+    this.loading = true;
+    this.cartService.removeFromCart(cartItemId).subscribe({
+      next: () => {
+        console.log("Item removed successfully");
+        this.cartItems = this.cartItems.filter(item => item.cartItemId !== cartItemId);
+        this.updateTotal();
+        this.loading = false; 
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error("Error removing item:", err);
+        this.loading = false;
+      }
+    });
+  }
 
-removeItem(cartItemId: number) {
-  this.loading = true;
-  this.cartService.removeFromCart(cartItemId).subscribe({
-    next: () => {
-      console.log("Item removed successfully");
-      this.cartItems = this.cartItems.filter(item => item.cartItemId !== cartItemId);
-      this.updateTotal();
-      this.loading = false; 
-      this.cdr.detectChanges();
-    },
-    error: (err) => {
-      console.error("Error removing item:", err);
-      this.loading = false;
-    }
-  });
-}
-
+  clearCart() {
+    this.loading = true;
+    this.cartService.clearCart().subscribe({
+      next: () => {
+        this.cartItems = [];
+        this.updateTotal();
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error("Error clearing cart:", err);
+        this.loading = false;
+      }
+    });
+  }
 }

@@ -1,0 +1,60 @@
+<div class="chat-bot-container">
+  <!-- Chat Bot Icon -->
+  <div class="chat-bot-icon" (click)="toggleChat()">
+    <i class="fas fa-comment"></i>
+  </div>
+
+  <!-- Chat Panel -->
+  <div class="chat-panel" [class.open]="isOpen">
+    <div class="chat-header">
+      <h3>Customer Support</h3>
+      <button class="close-btn" (click)="toggleChat()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="chat-messages">
+      <div *ngIf="messages.length === 0 && !isLoading" class="empty-chat">
+        <p>No messages yet. Start a conversation!</p>
+      </div>
+
+      <div *ngIf="isLoading && messages.length === 0" class="loading-messages">
+        <p>Loading chat history...</p>
+      </div>
+
+      <div *ngFor="let msg of messages" class="message" [ngClass]="{'user-message': msg.sender === 'User', 'bot-message': msg.sender === 'Bot'}">
+        <div class="message-content">
+          <p>{{ msg.message }}</p>
+          <span class="message-time">{{ msg.timestamp | date:'short' }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="isLoading && messages.length > 0" class="bot-typing">
+        <div class="typing-indicator">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <button (click)="sendQuickAction('Show my orders')">My Orders</button>
+      <button (click)="sendQuickAction('Show my cart')">My Cart</button>
+      <button (click)="sendQuickAction('Show my profile')">My Profile</button>
+      <button (click)="sendQuickAction('Help me find products')">Find Products</button>
+    </div>
+
+    <div class="chat-input">
+      <input 
+        type="text" 
+        [(ngModel)]="newMessage" 
+        placeholder="Type your message..." 
+        (keyup.enter)="sendMessage()"
+      >
+      <button (click)="sendMessage()" [disabled]="!newMessage.trim()">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,170 +1,403 @@
-<div class="product-page-wrapper">
-  <!-- sidebar -->
-  <aside class="sidebar">
-    <div class="sidebar-card">
-      <div class="sidebar-header">
-        <h5>Filter by Brand</h5>
-        <div class="brand-search">
-          <input
-            type="text"
-            placeholder="Search brands"
-            (input)="onSearchInput($any($event.target).value)"
-            [value]="brandSearch"
-          />
-        </div>
-      </div>
+<div class="product-page-container">
+  <!-- Page header with filters toggle for mobile -->
+  <div class="product-page-header">
+    <h1 class="page-title">Products</h1>
+    <div class="mobile-filter-toggle" (click)="toggleMobileFilters()">
+      <i class="fas fa-filter"></i> Filters
+      <span class="filter-badge" *ngIf="hasActiveFilters()">{{ getActiveFiltersCount() }}</span>
+    </div>
+  </div>
 
-      <ul class="brand-list">
-        <li
-          class="brand-item"
-          [class.active]="selectedBrandId === null"
-          (click)="filterByBrand(null)"
-        >
-          <input
-            type="checkbox"
-            [checked]="selectedBrandId === null"
-            readonly
-          />
-          <span class="brand-name">All Brands</span>
-          <span class="badge-count">{{ allProducts?.length || 0 }}</span>
-        </li>
-
-        <li
-          *ngFor="let brand of displayedBrands"
-          class="brand-item"
-          [class.active]="selectedBrandId === brand.id"
-          (click)="filterByBrand(brand.id)"
-        >
-          <input
-            type="checkbox"
-            [checked]="selectedBrandId === brand.id"
-            readonly
-          />
-          <span class="brand-name">{{ brand.name }}</span>
-          <span class="badge-count">{{ brand.count || 0 }}</span>
-        </li>
-      </ul>
-
-      <div class="sidebar-footer">
-        <a href="javascript:void(0)" (click)="toggleShowAll()">{{
-          showAllBrands ? "Show less" : "Show more"
-        }}</a>
-      </div>
-
-      <!-- Price filter -->
-      <div class="sidebar-card price-card">
-        <div class="sidebar-header">
-          <h5>Filter by Price</h5>
-        </div>
-        <div class="price-filter">
-          <label>
-            <input
-              type="radio"
-              name="priceRange"
-              [value]="null"
-              [(ngModel)]="selectedPriceRangeId"
-              (change)="filterByPrice()"
-            />
-            <span>All Prices</span>
-          </label>
-
-          <label *ngFor="let range of priceRanges">
-            <input
-              type="radio"
-              name="priceRange"
-              [value]="range.id"
-              [(ngModel)]="selectedPriceRangeId"
-              (change)="filterByPrice()"
-            />
-            <span>{{ range.label }}</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Rating filter (stars + counts) -->
-      <div class="sidebar-card rating-card">
-        <div class="sidebar-header">
-          <h5>Filter by Rating</h5>
+  <div class="product-page-wrapper">
+    <!-- sidebar -->
+    <aside class="sidebar" [class.mobile-visible]="showMobileFilters">
+      <div class="sidebar-card">
+        <div class="mobile-filter-header">
+          <h4>Filters</h4>
+          <button class="close-filters" (click)="toggleMobileFilters()">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
 
-        <div class="rating-list">
-          <!-- All Ratings -->
-          <div
-            class="rating-row"
-            [class.active]="selectedRating === null"
-            (click)="setRatingFilter(null)"
-          >
-            <div class="rating-stars">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="#f5c518"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M12 17.3L7.2 20l1-5.4L4 11.4l5.5-.8L12 6l2.5 4.6L20 11.4l-4.2 3.2L16.8 20z"
+        <!-- Active filters summary -->
+        <div class="active-filters" *ngIf="hasActiveFilters()">
+          <div class="sidebar-header">
+            <h5>Active Filters</h5>
+            <button class="clear-all-btn" (click)="clearAllFilters()">Clear All</button>
+          </div>
+          <div class="filter-chips">
+            <div class="filter-chip" *ngFor="let filter of activeFilters">
+              <span>{{ filter.label }}</span>
+              <button (click)="removeFilter(filter)">×</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search Filter -->
+        <div class="sidebar-section">
+          <div class="sidebar-header" (click)="toggleSection('search')">
+            <h5>Search Products</h5>
+            <i class="fas" [ngClass]="{'fa-chevron-down': !collapsedSections.search, 'fa-chevron-right': collapsedSections.search}"></i>
+          </div>
+          
+          <div class="section-content" [class.collapsed]="collapsedSections.search">
+            <div class="search-container">
+              <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  [(ngModel)]="searchQuery"
+                  (input)="onSearchInput($any($event.target).value)"
+                  (focus)="showSuggestions = searchSuggestions.length > 0"
+                  (blur)="hideSuggestions()"
                 />
-              </svg>
+                <div class="search-loading" *ngIf="isSearching">
+                  <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <button *ngIf="searchQuery" class="clear-search" (click)="searchQuery = ''; onSearchInput('')">×</button>
+              </div>
+              
+              <!-- Search suggestions dropdown -->
+              <div class="search-suggestions" *ngIf="showSuggestions && searchSuggestions.length > 0">
+                <div 
+                  class="suggestion-item" 
+                  *ngFor="let suggestion of searchSuggestions"
+                  (click)="onSearchSuggestionClick(suggestion)"
+                >
+                  <img *ngIf="suggestion.imageUrl" [src]="suggestion.imageUrl" [alt]="suggestion.name" class="suggestion-image">
+                  <span class="suggestion-name">{{ suggestion.name }}</span>
+                </div>
+              </div>
             </div>
-            <div class="rating-label">All Ratings</div>
-            <div class="rating-count">{{ allProducts?.length || 0 }}</div>
           </div>
+        </div>
 
-          <!-- each rating option -->
-          <div
-            *ngFor="let r of ratingOptions"
-            class="rating-row"
-            [class.active]="selectedRating === r"
-            (click)="setRatingFilter(r)"
-          >
-            <div class="rating-stars">
-              <ng-container *ngFor="let s of [1, 2, 3, 4, 5]">
-                <svg
-                  *ngIf="s <= r"
-                  class="star filled"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M12 17.3L7.2 20l1-5.4L4 11.4l5.5-.8L12 6l2.5 4.6L20 11.4l-4.2 3.2L16.8 20z"
+        <!-- Category filter -->
+        <div class="sidebar-section">
+          <div class="sidebar-header" (click)="toggleSection('category')">
+            <h5>Categories</h5>
+            <i class="fas" [ngClass]="{'fa-chevron-down': !collapsedSections.category, 'fa-chevron-right': collapsedSections.category}"></i>
+          </div>
+          
+          <div class="section-content" [class.collapsed]="collapsedSections.category">
+            <ul class="category-list">
+              <li
+                class="category-item"
+                [class.active]="selectedCategoryId === null"
+                (click)="filterByCategory(null)"
+              >
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    [checked]="selectedCategoryId === null"
+                    readonly
                   />
-                </svg>
-                <svg
-                  *ngIf="s > r"
-                  class="star empty"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M12 17.3L7.2 20l1-5.4L4 11.4l5.5-.8L12 6l2.5 4.6L20 11.4l-4.2 3.2L16.8 20z"
-                    fill="none"
-                    stroke="#ccc"
-                    stroke-width="1.2"
+                  <span class="checkmark"></span>
+                </div>
+                <span class="category-name">All Categories</span>
+                <span class="badge-count">{{ allProducts.length || 0 }}</span>
+              </li>
+
+              <li
+                *ngFor="let category of displayedCategories"
+                class="category-item"
+                [class.active]="selectedCategoryId === category.id"
+                (click)="filterByCategory(category.id)"
+              >
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    [checked]="selectedCategoryId === category.id"
+                    readonly
                   />
-                </svg>
-              </ng-container>
+                  <span class="checkmark"></span>
+                </div>
+                <span class="category-name">{{ category.name }}</span>
+                <span class="badge-count">{{ category.count || 0 }}</span>
+              </li>
+            </ul>
+
+            <div class="sidebar-footer" *ngIf="categories.length > topLimit">
+              <button class="show-more-btn" (click)="toggleShowAllCategories()">
+                <span>{{ showAllCategories ? "Show less" : "Show more" }}</span>
+                <i class="fas" [ngClass]="{'fa-chevron-up': showAllCategories, 'fa-chevron-down': !showAllCategories}"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Brand filter -->
+        <div class="sidebar-section">
+          <div class="sidebar-header" (click)="toggleSection('brand')">
+            <h5>Brands</h5>
+              <i class="fas" [ngClass]="{'fa-chevron-down': !collapsedSections.brand, 'fa-chevron-right': collapsedSections.brand}"></i>
+          </div>
+          
+          <div class="section-content" [class.collapsed]="collapsedSections.brand">
+            <div class="brand-search">
+              <i class="fas fa-search search-icon"></i>
+              <input
+                type="text"
+                placeholder="Search brands"
+                (input)="onBrandSearchInput($any($event.target).value)"
+                [value]="brandSearch"
+              />
+              <button *ngIf="brandSearch" class="clear-search" (click)="clearBrandSearch()">×</button>
             </div>
 
-            <!-- <div class="rating-label">{{ r }}</div>-->
+            <ul class="brand-list">
+              <li
+                class="brand-item"
+                [class.active]="selectedBrandId === null"
+                (click)="filterByBrand(null)"
+              >
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    [checked]="selectedBrandId === null"
+                    readonly
+                  />
+                  <span class="checkmark"></span>
+                </div>
+                <span class="brand-name">All Brands</span>
+                <span class="badge-count">{{ allProducts.length || 0 }}</span>
+              </li>
 
-            <div class="rating-count">
-              {{ getRatingCount(r) }}
+              <li
+                *ngFor="let brand of displayedBrands"
+                class="brand-item"
+                [class.active]="selectedBrandId === brand.id"
+                (click)="filterByBrand(brand.id)"
+              >
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    [checked]="selectedBrandId === brand.id"
+                    readonly
+                  />
+                  <span class="checkmark"></span>
+                </div>
+                <span class="brand-name">{{ brand.name }}</span>
+                <span class="badge-count">{{ brand.count || 0 }}</span>
+              </li>
+            </ul>
+
+            <div class="sidebar-footer" *ngIf="brands.length > topLimit">
+              <button class="show-more-btn" (click)="toggleShowAll()">
+                <span>{{ showAllBrands ? "Show less" : "Show more" }}</span>
+                <i class="fas" [ngClass]="{'fa-chevron-up': showAllBrands, 'fa-chevron-down': !showAllBrands}"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Price filter -->
+        <div class="sidebar-section">
+          <div class="sidebar-header" (click)="toggleSection('price')">
+            <h5>Price Range</h5>
+              <i class="fas" [ngClass]="{'fa-chevron-down': !collapsedSections.price, 'fa-chevron-right': collapsedSections.price}"></i>
+          </div>
+          
+          <div class="section-content" [class.collapsed]="collapsedSections.price">
+            <div class="price-filter">
+              <label>
+                <div class="radio-wrapper">
+                  <input
+                    type="radio"
+                    name="priceRange"
+                    [value]="null"
+                    [(ngModel)]="selectedPriceRangeId"
+                    (change)="filterByPrice()"
+                  />
+                  <span class="radio-mark"></span>
+                </div>
+                <span>All Prices</span>
+              </label>
+
+              <label *ngFor="let range of priceRanges">
+                <div class="radio-wrapper">
+                  <input
+                    type="radio"
+                    name="priceRange"
+                    [value]="range.id"
+                    [(ngModel)]="selectedPriceRangeId"
+                    (change)="filterByPrice()"
+                  />
+                  <span class="radio-mark"></span>
+                </div>
+                <span>{{ range.label }}</span>
+              </label>
+
+              <!-- Custom price range -->
+              <div class="custom-price-section">
+                <button class="custom-price-toggle" (click)="toggleCustomPrice()">
+                  <i class="fas" [ngClass]="{'fa-chevron-down': showCustomPrice, 'fa-chevron-right': !showCustomPrice}"></i>
+                  Custom Range
+                </button>
+                
+                <div class="custom-price-inputs" *ngIf="showCustomPrice">
+                  <div class="price-input-group">
+                    <label>Min Price ($)</label>
+                    <input 
+                      type="number" 
+                      [(ngModel)]="customMinPrice" 
+                      placeholder="0"
+                      min="0"
+                      (input)="applyCustomPriceRange()"
+                    />
+                  </div>
+                  <div class="price-input-group">
+                    <label>Max Price ($)</label>
+                    <input 
+                      type="number" 
+                      [(ngModel)]="customMaxPrice" 
+                      placeholder="∞"
+                      min="0"
+                      (input)="applyCustomPriceRange()"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rating filter -->
+        <div class="sidebar-section">
+          <div class="sidebar-header" (click)="toggleSection('rating')">
+            <h5>Customer Rating</h5>
+              <i class="fas" [ngClass]="{'fa-chevron-down': !collapsedSections.rating, 'fa-chevron-right': collapsedSections.rating}"></i>
+          </div>
+          
+          <div class="section-content" [class.collapsed]="collapsedSections.rating">
+            <div class="rating-list">
+              <!-- All Ratings -->
+              <div
+                class="rating-row"
+                [class.active]="selectedRating === null"
+                (click)="setRatingFilter(null)"
+              >
+                <div class="rating-stars">
+                  <i class="fas fa-star"></i>
+                </div>
+                <div class="rating-label">All Ratings</div>
+                <div class="rating-count">{{ allProducts.length || 0 }}</div>
+              </div>
+
+              <!-- each rating option -->
+              <div
+                *ngFor="let r of ratingOptions"
+                class="rating-row"
+                [class.active]="selectedRating === r"
+                (click)="setRatingFilter(r)"
+              >
+                <div class="rating-stars">
+                  <i class="fas fa-star filled" *ngFor="let s of [1, 2, 3, 4, 5]" [class.filled]="s <= r" [class.empty]="s > r"></i>
+                </div>
+                <div class="rating-label">{{ r }}+ Stars</div>
+                <div class="rating-count">{{ getRatingCount(r) }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Availability filter -->
+        <div class="sidebar-section">
+          <div class="sidebar-header" (click)="toggleSection('availability')">
+            <h5>Availability</h5>
+            <i class="fas" [ngClass]="{'fa-chevron-down': !collapsedSections.availability, 'fa-chevron-right': collapsedSections.availability}"></i>
+          </div>
+          
+          <div class="section-content" [class.collapsed]="collapsedSections.availability">
+            <div class="availability-list">
+              <div
+                class="availability-row"
+                [class.active]="selectedAvailability === null"
+                (click)="filterByAvailability(null)"
+              >
+                <div class="availability-icon">
+                  <i class="fas fa-box"></i>
+                </div>
+                <div class="availability-label">All Products</div>
+                <div class="availability-count">{{ allProducts.length || 0 }}</div>
+              </div>
+
+              <div
+                *ngFor="let option of availabilityOptions"
+                class="availability-row"
+                [class.active]="selectedAvailability === option.value"
+                (click)="filterByAvailability(option.value)"
+              >
+                <div class="availability-icon">
+                  <i class="fas" [ngClass]="{
+                    'fa-check-circle': option.value === 'in-stock',
+                    'fa-exclamation-triangle': option.value === 'low-stock',
+                    'fa-times-circle': option.value === 'out-of-stock'
+                  }"></i>
+                </div>
+                <div class="availability-label">{{ option.label }}</div>
+                <div class="availability-count">{{ option.count }}</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  </aside>
+    </aside>
 
-  <!-- products -->
-  <main class="products-area">
-    <div class="product-grid">
-      <app-product-card
-        *ngFor="let product of products"
-        [product]="product"
-      ></app-product-card>
-    </div>
-  </main>
+    <!-- products -->
+    <main class="products-area">
+      <!-- Loading state -->
+      <div class="loading-container" *ngIf="isLoading">
+        <div class="loading-spinner">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Loading products...</p>
+        </div>
+      </div>
 
+      <!-- Skeleton loading for product grid -->
+      <div class="skeleton-grid" *ngIf="isLoading">
+        <div class="skeleton-card" *ngFor="let item of [1,2,3,4,5,6,7,8]">
+          <div class="skeleton-image"></div>
+          <div class="skeleton-content">
+            <div class="skeleton-title"></div>
+            <div class="skeleton-price"></div>
+            <div class="skeleton-rating"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sort options -->
+      <div class="products-header" *ngIf="!isLoading">
+        <div class="results-count">
+          <span>{{ products.length }} Product{{ products.length !== 1 ? 's' : '' }} Found</span>
+          <span *ngIf="hasActiveFilters()" class="filtered-indicator">(filtered from {{ allProducts.length }} total)</span>
+        </div>
+        <div class="sort-options">
+          <label for="sort-select">Sort by:</label>
+          <select id="sort-select" [(ngModel)]="sortOption" (change)="onSortChange()">
+            <option *ngFor="let option of sortOptions" [value]="option.value">{{ option.label }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- No results message -->
+      <div class="no-results" *ngIf="!isLoading && products.length === 0">
+        <div class="no-results-icon">
+          <i class="fas fa-search"></i>
+        </div>
+        <h3>No products found</h3>
+        <p>Try adjusting your filters or search criteria</p>
+        <button class="btn-primary" (click)="clearAllFilters()">Clear All Filters</button>
+      </div>
+
+      <!-- Product grid -->
+      <div class="product-grid" *ngIf="!isLoading && products.length > 0">
+        <app-product-card
+          *ngFor="let product of products"
+          [product]="product"
+        ></app-product-card>
+      </div>
+    </main>
+  </div>
 </div>

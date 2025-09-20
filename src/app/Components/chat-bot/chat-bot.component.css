@@ -1,0 +1,247 @@
+.chat-bot-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.chat-bot-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #5a67d8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.chat-bot-icon:hover {
+  transform: scale(1.05);
+  background-color: #4c51bf;
+}
+
+.chat-bot-icon i {
+  color: white;
+  font-size: 24px;
+}
+
+.chat-panel {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 350px;
+  height: 500px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  transform: scale(0);
+  transform-origin: bottom right;
+  transition: transform 0.3s ease;
+  overflow: hidden;
+}
+
+.chat-panel.open {
+  transform: scale(1);
+}
+
+.chat-header {
+  padding: 15px;
+  background-color: #5a67d8;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.chat-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.message {
+  margin-bottom: 15px;
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
+.user-message {
+  align-self: flex-end;
+}
+
+.bot-message {
+  align-self: flex-start;
+}
+
+.message-content {
+  padding: 10px 15px;
+  border-radius: 18px;
+  position: relative;
+}
+
+.user-message .message-content {
+  background-color: #5a67d8;
+  color: white;
+  border-bottom-right-radius: 5px;
+}
+
+.bot-message .message-content {
+  background-color: #f3f4f6;
+  color: #1f2937;
+  border-bottom-left-radius: 5px;
+}
+
+.message-content p {
+  margin: 0;
+}
+
+.message-time {
+  font-size: 10px;
+  opacity: 0.7;
+  display: block;
+  margin-top: 5px;
+}
+
+.chat-input {
+  padding: 15px;
+  display: flex;
+  border-top: 1px solid #e5e7eb;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 10px 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 20px;
+  outline: none;
+  font-size: 14px;
+}
+
+.chat-input button {
+  background-color: #5a67d8;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin-left: 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.chat-input button:hover {
+  background-color: #4c51bf;
+}
+
+.chat-input button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.empty-chat {
+  text-align: center;
+  color: #6b7280;
+  margin-top: 20px;
+}
+
+.loading-messages {
+  text-align: center;
+  color: #6b7280;
+  margin-top: 20px;
+}
+
+.bot-typing {
+  align-self: flex-start;
+  margin-bottom: 15px;
+}
+
+.typing-indicator {
+  background-color: #f3f4f6;
+  padding: 10px 15px;
+  border-radius: 18px;
+  border-bottom-left-radius: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.typing-indicator span {
+  height: 8px;
+  width: 8px;
+  background-color: #9ca3af;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+  animation: typing 1s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+  margin-right: 0;
+}
+
+@keyframes typing {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 15px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.quick-actions button {
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 15px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quick-actions button:hover {
+  background-color: #e5e7eb;
+}

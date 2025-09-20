@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { ICategory } from '../Models/icategory';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
@@ -38,8 +39,19 @@ export class CategoryServices {
 //   }
 
   getAllCategories(): Observable<ICategory[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/Category/all`).pipe(
+      map(categories => categories.map(c => ({
+        id: c.id,
+        name: c.name,
+        description: c.description,
+        count: c.productCount || 0 // Use productCount from backend or default to 0
+      })))
+    );
+  }
 
-    return this.http.get<ICategory[]>(`${this.apiUrl}/Category/all`);
+  // Get products by category ID
+  getCategoryProducts(categoryId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/Category/${categoryId}/products`);
   }
   
 }

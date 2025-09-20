@@ -11,7 +11,7 @@ export class PaymentService {
   constructor(private http: HttpClient) {}
 
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('auth_token');
     if (!token) {
       throw new Error('User not authenticated');
     }
