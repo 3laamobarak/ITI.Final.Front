@@ -1,0 +1,11 @@
+<div class="chat-window">
+  <div *ngFor="let msg of messages">
+    <div [ngClass]="msg.sender !== 'admin' ? 'sent' : 'received'">
+      <p>{{ msg.message }} <span>{{ msg.timestamp | date:'short' }}</span></p>
+    </div>
+  </div>
+</div>
+<form (ngSubmit)="sendMessage()">
+  <input type="text" [(ngModel)]="newMessage" name="newMessage" placeholder="Type message..." (keyup.enter)="sendMessage()" />
+  <button type="submit">Send</button>
+</form>
