@@ -12,9 +12,9 @@ export class EmailVerifyService {
 
   sendCode(email: string): Observable<any> {
     const body = {
-      to: email,
-      subject: 'Verify your email',
-      body: 'Your verification code'
+      To: email,
+      Subject: 'Verify your email',
+      Body: 'Your verification code'
     };
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(`${this.baseUrl}/send`, body, { headers });
@@ -22,7 +22,7 @@ export class EmailVerifyService {
 
 // In `email-verify-service.ts`
   validateCode(email: string, code: string): Observable<any> {
-    const body = { email, code };
+    const body = { Email: email, Code: code };
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(`${this.baseUrl}/validate`, body, { headers, responseType: 'text' as 'json' });
   }

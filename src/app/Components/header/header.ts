@@ -6,6 +6,8 @@ import {
   OnDestroy,
   HostListener,
   AfterViewChecked,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Subject, Subscription, of } from 'rxjs';
@@ -19,6 +21,7 @@ import { ProductServices } from '../../Services/product-services';
 import { CategoryServices } from '../../Services/category-services';
 import { CartServices } from '../../Services/cart-services';
 import { ICategory } from '../../Models/icategory';
+import { User } from '../../Services/user';
 
 @Component({
   selector: 'app-header',
@@ -27,14 +30,23 @@ import { ICategory } from '../../Models/icategory';
   styleUrls: ['./header.css'],
 })
 export class Header implements OnInit, OnDestroy, AfterViewChecked {
+  @ViewChild('searchInput') searchInputElement!: ElementRef;
+  
   query = '';
   suggestions: { id: number; name: string }[] = [];
   categories: ICategory[] = [];
   cartCount = 0;
   showPanel = false;
   isLoading = false;
+  isLoggedIn = false;
+  showProfileMenu = false;
+  userName = '';
+  isMobile = false;
+  recentSearches: string[] = [];
 
   openIndex: number | null = null;
+  categoryProducts: any[] = [];
+  loadingProducts = false;
 
   trending: string[] = [
     'Vitamin C',
@@ -55,20 +67,29 @@ export class Header implements OnInit, OnDestroy, AfterViewChecked {
     private categorySvc: CategoryServices,
     private cd: ChangeDetectorRef,
     private router: Router,
-    private cartService: CartServices
+    private cartService: CartServices,
+    private userService: User
   ) {}
 
   ngOnInit(): void {
+    // Check login status
+    this.checkLoginStatus();
+    
     // load categories (API + fallback)
     const s1 = this.categorySvc
       .getAllCategories()
-      .pipe(catchError(() => of([])))
+      .pipe(catchError((error) => {
+        console.error('Error fetching categories:', error);
+        return of([]);
+      }))
       .subscribe((cats) => {
+        console.log('Categories from API:', cats);
         this.categories =
           cats && cats.length > 0
             ? cats
             : [
                 {
+                  id: 1,
                   name: 'Supplements',
                   subcategories: [
                     'Vitamins',
@@ -79,22 +100,27 @@ export class Header implements OnInit, OnDestroy, AfterViewChecked {
                   ],
                 },
                 {
+                  id: 2,
                   name: 'Sports Nutrition',
                   subcategories: ['Protein & Powders', 'Creatine', 'Amino Acids'],
                 },
                 {
+                  id: 3,
                   name: 'Personal Care',
                   subcategories: ['Skin Care', 'Hair Care', 'Bath & Body'],
                 },
                 {
+                  id: 4,
                   name: 'Grocery',
                   subcategories: ['Snacks', 'Baking', 'Tea & Coffee'],
                 },
                 {
+                  id: 5,
                   name: 'Baby & Kids',
                   subcategories: ['Baby Vitamins', 'Formulas', 'Diapers'],
                 },
               ];
+        console.log('Final categories:', this.categories);
         this.cd.detectChanges();
       });
     this.subs.push(s1);
@@ -109,11 +135,14 @@ export class Header implements OnInit, OnDestroy, AfterViewChecked {
     // load search history
     const saved = localStorage.getItem(this.historyKey);
     this.searchHistory = saved ? JSON.parse(saved) : [];
+    
+    // Get recent searches for quick access
+    this.recentSearches = this.searchHistory.slice(0, 3);
 
-    // suggestions stream
+    // suggestions stream with improved error handling and loading states
     const s3 = this.search$
       .pipe(
-        debounceTime(180),
+        debounceTime(300), // Increased debounce time for better performance
         distinctUntilChanged(),
         switchMap((term) => {
           const q = (term || '').trim();
@@ -126,7 +155,12 @@ export class Header implements OnInit, OnDestroy, AfterViewChecked {
           this.isLoading = true;
           return this.productSvc
             .getSuggestionsClient(q)
-            .pipe(catchError(() => of([])));
+            .pipe(
+              catchError((error) => {
+                console.error('Error fetching suggestions:', error);
+                return of([]);
+              })
+            );
         })
       )
       .subscribe((res: any[]) => {
@@ -137,6 +171,56 @@ export class Header implements OnInit, OnDestroy, AfterViewChecked {
         this.cd.detectChanges();
       });
     this.subs.push(s3);
+  }
+
+
+
+  // Focus search input
+  focusSearch() {
+    if (this.searchInputElement) {
+      this.searchInputElement.nativeElement.focus();
+    }
+  }
+
+  // Clear search input
+  clearSearch() {
+    this.query = '';
+    this.suggestions = [];
+    this.showPanel = false;
+    this.cd.detectChanges();
+    this.focusSearch();
+  }
+
+  // Check if user is logged in
+  checkLoginStatus() {
+    this.isLoggedIn = this.userService.isLoggedIn();
+    if (this.isLoggedIn) {
+      this.userName = localStorage.getItem(this.userService.TokenUser) || 'User';
+    } else {
+      this.isLoggedIn = false;
+      this.userName = '';
+    }
+  }
+
+  // Toggle profile menu
+  toggleProfileMenu(event: Event) {
+    event.stopPropagation();
+    this.showProfileMenu = !this.showProfileMenu;
+  }
+
+  // Logout function
+  logout() {
+    this.userService.logout();
+    localStorage.removeItem(this.userService.TokenUser);
+    this.isLoggedIn = false;
+    this.showProfileMenu = false;
+    this.router.navigate(['/login-register']);
+  }
+
+  // Close profile menu when clicking outside
+  @HostListener('document:click')
+  closeProfileMenu() {
+    this.showProfileMenu = false;
   }
 
   ngAfterViewChecked(): void {
@@ -198,9 +282,11 @@ export class Header implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   closePanel() {
-    this.showPanel = false;
-    this.highlightedIndex = -1;
-    this.cd.detectChanges();
+    setTimeout(() => {
+      this.showPanel = false;
+      this.highlightedIndex = -1;
+      this.cd.detectChanges();
+    }, 150); // Small delay to allow click events to register
   }
 
   onSearch(value?: string) {
@@ -209,13 +295,20 @@ export class Header implements OnInit, OnDestroy, AfterViewChecked {
     this.pushHistory(term);
     this.router.navigate(['productsList'], { queryParams: { search: term } });
     this.showPanel = false;
+    
+    // Update recent searches
+    this.recentSearches = this.searchHistory.slice(0, 3);
   }
 
   onSelectSuggestion(s: { id: number; name: string }) {
     if (!s) return;
     this.pushHistory(s.name);
+    this.query = s.name; // Update input field with selected suggestion
     this.router.navigate(['productsList'], { queryParams: { search: s.name } });
     this.showPanel = false;
+    
+    // Update recent searches
+    this.recentSearches = this.searchHistory.slice(0, 3);
   }
 
   onSelectCategory(cat: ICategory, sub?: string) {
@@ -256,9 +349,17 @@ export class Header implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   // Close mega menu if click outside
-  @HostListener('document:click', ['$event'])
+  @HostListener('document:click', [])
   onDocumentClick() {
     this.openIndex = null;
+    this.categoryProducts = [];
+  }
+
+  // Handle product selection from mega menu
+  onSelectProduct(product: any) {
+    this.router.navigate(['/product', product.id]);
+    this.openIndex = null;
+    this.categoryProducts = [];
   }
 
   // Escape closes panel
@@ -273,6 +374,106 @@ export class Header implements OnInit, OnDestroy, AfterViewChecked {
   // Toggle mega panel
   openMega(index: number, ev?: Event) {
     ev?.stopPropagation();
-    this.openIndex = this.openIndex === index ? null : index;
+    if (this.openIndex === index) {
+      this.openIndex = null;
+      this.categoryProducts = [];
+    } else {
+      this.openIndex = index;
+      this.loadCategoryProducts(index);
+    }
+  }
+
+  // Load products for the selected category
+  loadCategoryProducts(categoryIndex: number) {
+    if (categoryIndex >= 0 && categoryIndex < this.categories.length) {
+      const category = this.categories[categoryIndex];
+      this.loadingProducts = true;
+      
+      console.log('Loading products for category:', category);
+      
+      // Try to use category ID if available, otherwise fallback to filtering
+      if (category.id) {
+        this.categorySvc.getCategoryProducts(category.id)
+          .pipe(catchError((error) => {
+            console.error('Error fetching category products:', error);
+            return of([]);
+          }))
+          .subscribe((products: any[]) => {
+            console.log('Products from API:', products);
+            this.categoryProducts = products.slice(0, 8);
+            this.loadingProducts = false;
+            this.cd.detectChanges();
+          });
+      } else {
+        // Fallback: Get products by category name
+        this.productSvc.getProductsByCategoryName(category.name)
+          .pipe(catchError((error) => {
+            console.error('Error fetching products by category name:', error);
+            return of([]);
+          }))
+          .subscribe((products: any[]) => {
+            console.log('Products by category name:', products);
+            this.categoryProducts = products.slice(0, 8);
+            this.loadingProducts = false;
+            this.cd.detectChanges();
+          });
+      }
+    }
+  }
+
+  // Handle special filter navigation
+  onSpecialFilter(filterType: string) {
+    let queryParams: any = {};
+    
+    switch(filterType) {
+      case 'specials':
+        queryParams = { special: 'discount' };
+        break;
+      case 'best-sellers':
+        queryParams = { sort: 'popularity' };
+        break;
+      case 'try':
+        queryParams = { tag: 'sample' };
+        break;
+      case 'new':
+        queryParams = { sort: 'newest' };
+        break;
+      case 'wellness':
+        queryParams = { category: 'Wellness' };
+        break;
+    }
+    
+    this.router.navigate(['productsList'], { queryParams });
+  }
+
+  // Get appropriate icon for category
+  getCategoryIcon(categoryName: string): string {
+    const iconMap: { [key: string]: string } = {
+      'Supplements': 'fas fa-pills',
+      'Sports Nutrition': 'fas fa-dumbbell',
+      'Personal Care': 'fas fa-spa',
+      'Grocery': 'fas fa-shopping-basket',
+      'Baby & Kids': 'fas fa-baby',
+      'Vitamins': 'fas fa-pills',
+      'Minerals': 'fas fa-gem',
+      'Antioxidants': 'fas fa-leaf',
+      'Herbs': 'fas fa-seedling',
+      'Fish Oils & Omegas': 'fas fa-fish',
+      'Protein & Powders': 'fas fa-dumbbell',
+      'Creatine': 'fas fa-fire',
+      'Amino Acids': 'fas fa-atom',
+      'Skin Care': 'fas fa-hand-sparkles',
+      'Hair Care': 'fas fa-cut',
+      'Bath & Body': 'fas fa-bath',
+      'Snacks': 'fas fa-cookie-bite',
+      'Baking': 'fas fa-birthday-cake',
+      'Tea & Coffee': 'fas fa-coffee',
+      'Baby Vitamins': 'fas fa-baby',
+      'Formulas': 'fas fa-baby-carriage',
+      'Diapers': 'fas fa-baby'
+    };
+    
+    return iconMap[categoryName] || 'fas fa-tags';
   }
 }
+

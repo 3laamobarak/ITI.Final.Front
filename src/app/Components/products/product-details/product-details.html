@@ -6,6 +6,7 @@
 
 
 
+
   <!-- Product Page Layout -->
   <section *ngIf="!loading && product" class="product-page my-5">
     <!-- ====== Gallery ====== -->
@@ -30,10 +31,56 @@
     <!-- ====== Product Details ====== -->
     <div class="details">
       <h1 class="name">{{ product.name }}</h1>
-      <div class="rating" [innerHTML]="getStars(product.averageRating ?? 0)"></div>
+      
+      <!-- Product Badges -->
+      <div class="badges">
+        <span class="badge green">100% Authentic</span>
+        <span class="badge blue">Free Shipping</span>
+        <span class="badge gray" *ngIf="(product.reviews || 0) > 10">Best Seller</span>
+        <span class="badge orange" *ngIf="(product.averageRating || 0) >= 4.5">Highly Rated</span>
+      </div>
+      
+      <div class="rating-section">
+        <div class="rating-main">
+          <div class="rating" [innerHTML]="getStars(product.averageRating ?? 0)"></div>
+          <div class="rating-number">
+            <span class="rating-value">{{ (product.averageRating || 0) | number:'1.1-1' }}</span>
+            <span class="rating-out-of">/ 5.0</span>
+          </div>
+        </div>
+        <div class="rating-details">
+          <div class="rating-count">
+            <span class="count-number">{{ product.reviews || 0 }}</span>
+            <span class="count-text">{{ (product.reviews || 0) === 1 ? 'review' : 'reviews' }}</span>
+          </div>
+          <div class="rating-summary" [class]="getRatingColorClass()">{{ getRatingSummary() }}</div>
+        </div>
+        <div class="rating-insights" *ngIf="getRatingInsights().length > 0">
+          <div class="insight-item" *ngFor="let insight of getRatingInsights()">
+            <i class="fas fa-check-circle"></i>
+            <span>{{ insight }}</span>
+          </div>
+          <div class="insight-item">
+            <i class="fas fa-chart-line"></i>
+            <span>{{ getRatingComparison() }}</span>
+          </div>
+          <div class="insight-item">
+            <i class="fas fa-info-circle"></i>
+            <span>{{ getRatingTrend() }}</span>
+          </div>
+        </div>
+      </div>
       <div class="stock" [class.in-stock]="product.stockQuantity">
         {{ product.stockQuantity ? 'In Stock' : 'Out of Stock' }}
       </div>
+      
+      <!-- Product Meta -->
+      <ul class="meta">
+        <!-- <li><strong>Brand:</strong> {{ product.brandName || 'Premium Brand' }}</li> -->
+        <li><strong>SKU:</strong> {{ product.id }}</li>
+        <!-- <li><strong>Category:</strong> {{ product.categoryName || 'Supplements' }}</li> -->
+        <li><strong>Weight:</strong> 0.26 kg</li>
+      </ul>
 
       <div class="description">
         <ul>
@@ -79,20 +126,28 @@
           Add to Wishlist
         </button>
       </div>
+      
+      <!-- Trust Indicators -->
+      <div class="trust-row">
+        <div class="trust-item">
+          <i class="fas fa-shield-alt"></i>
+          <div>Secure Payment</div>
+        </div>
+        <div class="trust-item">
+          <i class="fas fa-truck"></i>
+          <div>Free Shipping</div>
+        </div>
+        <div class="trust-item">
+          <i class="fas fa-undo"></i>
+          <div>Easy Returns</div>
+        </div>
+      </div>
     </div>
   </section>
 
 
-  <!-- customer also viewed section -->
-  <section class="also-viewed">
-    <h5 class="ms-5">Customers Also Viewed</h5> 
-    <!-- product slider component  -->
-    <app-product-slider class="p-5" [products]="productsAlsoViewed"></app-product-slider>
-  </section>
-
-
   <!-- product overview -->
- <div class="product-overview">
+ <div id="overview" class="product-overview">
     <div class="product-header">Product overview</div>
     <div class="overview-grid">
       
@@ -155,8 +210,186 @@
     </div>
   </div>
 
-  <!-- Questions and answers -->
-  <section class="m-5">
-    <h3>Questions and Answers</h3>
+
+
+  <!-- Recommended Products -->
+  <section class="recommended-section">
+    <div class="section-header">
+      <div class="header-content">
+        <h3>Recommended for You</h3>
+        <p>Products you might also like</p>
+      </div>
+      <a routerLink="/productsList" class="view-all-link">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="slider-wrapper">
+      <div *ngIf="loadingRecommended" class="slider-loading">
+        <div class="loading-spinner">
+          <div class="spinner"></div>
+          <p>Loading recommended products...</p>
+        </div>
+      </div>
+      <app-product-slider *ngIf="!loadingRecommended" class="enhanced-slider" [products]="recommendedProducts"></app-product-slider>
+    </div>
   </section>
+
+  <!-- Reviews Section -->
+  <section id="reviews" class="reviews-section">
+    <div class="reviews-header">
+      <h3>Customer Reviews</h3>
+      <div class="aggregate" *ngIf="product">
+        <span class="agg-stars" [innerHTML]="getStars(product.averageRating ?? 0)"></span>
+        <span class="agg-text">
+          {{ (product.averageRating || 0) | number:'1.1-1' }}/5 
+          ({{ product.reviews || 0 }} {{ (product.reviews || 0) === 1 ? 'review' : 'reviews' }})
+        </span>
+      </div>
+    </div>
+
+    <!-- Controls and breakdown -->
+    <div class="reviews-toolbar">
+      <div class="filters">
+        <button class="chip" [class.active]="starFilter === 0" (click)="setStarFilter(0)">All</button>
+        <button class="chip" [class.active]="starFilter === 5" (click)="setStarFilter(5)">5★</button>
+        <button class="chip" [class.active]="starFilter === 4" (click)="setStarFilter(4)">4★</button>
+        <button class="chip" [class.active]="starFilter === 3" (click)="setStarFilter(3)">3★</button>
+        <button class="chip" [class.active]="starFilter === 2" (click)="setStarFilter(2)">2★</button>
+        <button class="chip" [class.active]="starFilter === 1" (click)="setStarFilter(1)">1★</button>
+      </div>
+      <div class="sorter">
+        <label>Sort by</label>
+        <select [(ngModel)]="sortOption" (change)="changeSort(sortOption)">
+          <option value="newest">Newest</option>
+          <option value="highest">Highest rated</option>
+          <option value="lowest">Lowest rated</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="rating-breakdown" *ngIf="reviews?.length">
+      <div class="breakdown-header">
+        <h4>Rating Distribution</h4>
+        <span class="total-reviews">{{ reviews.length }} total reviews</span>
+      </div>
+      <div class="breakdown-rows">
+        <div class="breakdown-row" *ngFor="let b of ratingBreakdown">
+          <span class="star-label">{{b.star}}★</span>
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="b.pct" [class]="'rating-' + b.star"></div>
+            </div>
+            <span class="percentage">{{ b.pct | number:'1.0-0' }}%</span>
+          </div>
+          <span class="count">{{b.count}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="loadingReviews" class="reviews-loading">
+      <div class="skeleton review-skel" *ngFor="let s of [1,2,3]"></div>
+    </div>
+
+    <div *ngIf="!loadingReviews && reviews?.length === 0" class="no-reviews">
+      <div class="no-reviews-content">
+        <i class="fas fa-star" style="font-size: 2rem; color: #ddd; margin-bottom: 10px;"></i>
+        <h4>No reviews yet</h4>
+        <p>Be the first to review this product and help other customers make their decision.</p>
+      </div>
+    </div>
+
+    <ul class="reviews-list" *ngIf="!loadingReviews && filteredReviews?.length">
+      <li class="review-item" *ngFor="let r of pagedReviews" [class.own-review]="canDeleteReview(r)">
+        <div class="review-top">
+          <div class="review-user">
+            <div class="avatar" [class.own-avatar]="canDeleteReview(r)">{{ (r.userName || 'U')[0] | uppercase }}</div>
+            <div>
+              <div class="name">
+                {{ r.userName || 'User' }}
+                <span class="own-review-badge" *ngIf="canDeleteReview(r)">(You)</span>
+              </div>
+              <div class="date">{{ r.createdAt | date:'mediumDate' }}</div>
+            </div>
+          </div>
+          <div class="review-stars" [innerHTML]="getStars(r.rating)"></div>
+        </div>
+        <div class="review-comment">{{ r.comment }}</div>
+        <div class="review-actions">
+          <button class="link" [class.disabled]="hasVotedHelpful(r.id)" (click)="markHelpful(r.id)">
+            Helpful ({{ getHelpfulCount(r.id) }})
+          </button>
+          <button class="link danger" *ngIf="canDeleteReview(r)" (click)="deleteReview(r.id)">Delete</button>
+        </div>
+      </li>
+    </ul>
+
+    <div class="load-more" *ngIf="canLoadMore()">
+      <button class="btn secondary" (click)="loadMore()">Load more</button>
+    </div>
+
+    <div class="review-form-card">
+      <h4>Write a review</h4>
+      
+      <!-- User already reviewed -->
+      <div *ngIf="isLoggedIn && hasUserReviewed()" class="already-reviewed">
+        <div class="reviewed-message">
+          <i class="fas fa-check-circle"></i>
+          <span>You have already reviewed this product</span>
+        </div>
+        <div class="user-review-summary">
+          <div class="user-review-rating">
+            <span class="user-review-stars" [innerHTML]="getStars(getUserReview()?.rating || 0)"></span>
+            <span class="user-review-text">{{ getUserReview()?.rating }}/5</span>
+          </div>
+          <div class="user-review-comment">{{ getUserReview()?.comment }}</div>
+          <div class="user-review-date">Reviewed on {{ getUserReview()?.createdAt | date:'mediumDate' }}</div>
+        </div>
+        <button class="btn danger" (click)="deleteUserReview()">
+          <i class="fas fa-trash"></i>
+          Delete My Review
+        </button>
+      </div>
+      
+      <!-- User not logged in -->
+      <div *ngIf="!isLoggedIn" class="login-hint">
+        Please log in to submit a review.
+      </div>
+      
+      <!-- Review form for users who haven't reviewed -->
+      <div *ngIf="isLoggedIn && !hasUserReviewed()">
+        <div class="rating-picker">
+          <button type="button" *ngFor="let s of [1,2,3,4,5]"
+                  [class.active]="reviewForm.rating >= s"
+                  (click)="setRating(s)">★</button>
+        </div>
+        <textarea rows="4" [(ngModel)]="reviewForm.comment" placeholder="Share your experience..."></textarea>
+        <div class="error" *ngIf="reviewError">{{ reviewError }}</div>
+        <div class="success" *ngIf="reviewSuccess">{{ reviewSuccess }}</div>
+        <button class="btn primary" (click)="submitReview()" [disabled]="submittingReview">
+          {{ submittingReview ? 'Submitting...' : 'Submit Review' }}
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Floating Add to Cart Bar (Mobile) -->
+  <div class="floating-cart" *ngIf="!loading && product">
+    <div class="floating-cart-content">
+      <div class="floating-price">
+        <span class="price">{{ product.price | currency:'EGP' }}</span>
+        <div class="floating-rating">
+          <span class="floating-stars" [innerHTML]="getStars(product.averageRating ?? 0)"></span>
+          <span class="floating-rating-text">{{ (product.averageRating || 0) | number:'1.1-1' }}</span>
+        </div>
+        <span class="stock-indicator" [class.in-stock]="product.stockQuantity">
+          {{ product.stockQuantity ? 'In Stock' : 'Out of Stock' }}
+        </span>
+      </div>
+      <div class="floating-actions">
+        <button class="btn primary" (click)="addToCart(product, qty)" [disabled]="!product.stockQuantity">
+          <i class="fas fa-shopping-cart"></i>
+          Add to Cart
+        </button>
+      </div>
+    </div>
+  </div>
+
 

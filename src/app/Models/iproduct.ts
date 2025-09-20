@@ -18,6 +18,7 @@ export interface IProduct {
 
   averageRating?: number;
   reviews?: number;
+  reviewCount?: number;
   stockQuantity?: number;
 
   Overview?: string;

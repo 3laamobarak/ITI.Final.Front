@@ -1,92 +1,404 @@
-<!-- Corrected template to call the new validation methods -->
-<!-- Login/Register Page -->
-<div class="book-auth-container">
-  <div class="book" [style.height]="bookHeight">
-    <div class="book-page" [class.flipped]="!isLogin">
-      <!-- Login Page -->
-      <form (ngSubmit)="onLoginSubmit()" class="auth-form book-face">
-        <h2>Login</h2>
+<!-- Modern Login/Register Component -->
+<div class="auth-container">
+  <!-- Background Elements -->
+  <div class="bg-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Main Auth Card -->
+  <div class="auth-card">
+    <!-- Header -->
+    <div class="auth-header">
+      <div class="logo">
+        <svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" class="logo-img">
+          <defs>
+            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#5ba600;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#4c8c00;stop-opacity:1" />
+            </linearGradient>
+            <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#5ba600;stop-opacity:1" />
+              <stop offset="50%" style="stop-color:#4c8c00;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#3d7000;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          
+          <!-- Background circle for icon -->
+          <circle cx="30" cy="30" r="25" fill="url(#iconGradient)" opacity="0.1"/>
+          
+          <!-- Main icon - stylized "F" with fitness elements -->
+          <g transform="translate(15, 15)">
+            <!-- Vertical bar of F -->
+            <rect x="0" y="0" width="4" height="30" rx="2" fill="url(#iconGradient)"/>
+            
+            <!-- Top horizontal bar of F -->
+            <rect x="0" y="0" width="20" height="4" rx="2" fill="url(#iconGradient)"/>
+            
+            <!-- Middle horizontal bar of F -->
+            <rect x="0" y="13" width="15" height="4" rx="2" fill="url(#iconGradient)"/>
+            
+            <!-- Fitness accent - small dumbbell -->
+            <g transform="translate(22, 8)">
+              <rect x="0" y="6" width="8" height="2" rx="1" fill="url(#iconGradient)"/>
+              <circle cx="2" cy="7" r="2" fill="url(#iconGradient)"/>
+              <circle cx="6" cy="7" r="2" fill="url(#iconGradient)"/>
+            </g>
+            
+            <!-- Health accent - leaf -->
+            <g transform="translate(22, 18)">
+              <path d="M2,0 Q4,2 2,4 Q0,2 2,0" fill="url(#iconGradient)" opacity="0.8"/>
+              <line x1="2" y1="4" x2="2" y2="6" stroke="url(#iconGradient)" stroke-width="1" opacity="0.8"/>
+            </g>
+          </g>
+        </svg>
+        <div class="logo-text">
+          <span class="brand-name">FitZone</span>
+          <span class="tagline">HEALTH & FITNESS</span>
+        </div>
+      </div>
+      <h1>{{ isLogin ? 'Welcome Back' : 'Join FitZone' }}</h1>
+      <p>{{ isLogin ? 'Sign in to continue your fitness journey' : 'Start your health and fitness journey with us' }}</p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="auth-tabs">
+      <button 
+        class="tab-btn" 
+        [class.active]="isLogin" 
+        (click)="toggleForm(true)">
+        <i class="fa fa-sign-in"></i>
+        Login
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="!isLogin" 
+        (click)="toggleForm(false)">
+        <i class="fa fa-user-plus"></i>
+        Register
+      </button>
+    </div>
+
+    <!-- Login Form -->
+    <div class="auth-form-container" *ngIf="isLogin">
+      <form (ngSubmit)="onLoginSubmit()" class="auth-form">
         <div class="form-group">
-          <label for="loginEmail">Email</label>
-          <input id="loginEmail" type="email" [(ngModel)]="loginData.email" name="loginEmail" required email (input)="validateLoginFields()" />
+          <label for="loginEmail">
+            <i class="fa fa-envelope"></i>
+            Email Address
+          </label>
+          <input 
+            id="loginEmail" 
+            type="email" 
+            [(ngModel)]="loginData.email" 
+            name="loginEmail" 
+            placeholder="Enter your email"
+            required 
+            email 
+            (input)="clearFieldError('email'); validateLoginFields()" />
           <div class="error" *ngIf="loginErrors.email">{{ loginErrors.email }}</div>
         </div>
-        <div class="form-group password-group">
-          <label for="loginPassword">Password</label>
-          <div class="password-wrapper">
-            <input id="loginPassword" [type]="showLoginPassword ? 'text' : 'password'" [(ngModel)]="loginData.password" name="loginPassword" required minlength="6" (input)="validateLoginFields()" />
-            <span class="eye-icon" (click)="showLoginPassword = !showLoginPassword">
+
+        <div class="form-group">
+          <label for="loginPassword">
+            <i class="fa fa-lock"></i>
+            Password
+          </label>
+          <div class="password-input">
+            <input 
+              id="loginPassword" 
+              [type]="showLoginPassword ? 'text' : 'password'" 
+              [(ngModel)]="loginData.password" 
+              name="loginPassword" 
+              placeholder="Enter your password"
+              required 
+              minlength="6" 
+              (input)="clearFieldError('password'); validateLoginFields()" />
+            <button type="button" class="password-toggle" (click)="showLoginPassword = !showLoginPassword">
               <i class="fa" [ngClass]="showLoginPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-            </span>
+            </button>
           </div>
           <div class="error" *ngIf="loginErrors.password">{{ loginErrors.password }}</div>
         </div>
-        <button type="submit" class="btn">Login</button>
-        <div class="switch-link">
-          Don’t have an account?
-          <a (click)="toggleForm(false)">Sign up</a>
+
+        <div class="form-options">
+          <label class="checkbox-container">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            Remember me
+          </label>
+          <a href="#" class="forgot-password">Forgot Password?</a>
         </div>
+
+        <button type="submit" class="btn btn-primary">
+          <i class="fa fa-sign-in"></i>
+          Sign In
+        </button>
+
+        <div class="divider">
+          <span>or</span>
+        </div>
+
+        <button type="button" class="btn btn-google">
+          <i class="fa fa-google"></i>
+          Continue with Google
+        </button>
       </form>
     </div>
-    <div class="book-page back-page" [class.flipped]="isLogin">
-      <!-- Register Page -->
+
+    <!-- Register Form -->
+    <div class="auth-form-container" *ngIf="!isLogin">
       <form (ngSubmit)="onRegisterSubmit()" class="auth-form">
-        <h2>Register</h2>
-        <div class="form-group">
-          <label for="userName">User Name</label>
-          <input id="userName" type="text" [(ngModel)]="registerData.userName" name="userName" required (input)="validateRegisterFields()" />
-          <div class="error" *ngIf="registerErrors.userName">{{ registerErrors.userName }}</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="userName">
+              <i class="fa fa-user"></i>
+              Username
+            </label>
+            <input 
+              id="userName" 
+              type="text" 
+              [(ngModel)]="registerData.userName" 
+              name="userName" 
+              placeholder="Choose a username"
+              required 
+              (input)="onUsernameChange()" />
+            <div class="error" *ngIf="registerErrors.userName">{{ registerErrors.userName }}</div>
+          </div>
         </div>
-        <div class="FandLname">
-        <div class="form-group">
-          <label for="firstName">First Name</label>
-          <input id="firstName" type="text" [(ngModel)]="registerData.firstName" name="firstName" required (input)="validateRegisterFields()" />
-          <div class="error" *ngIf="registerErrors.firstName">{{ registerErrors.firstName }}</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">
+              <i class="fa fa-user-circle"></i>
+              First Name
+            </label>
+            <input 
+              id="firstName" 
+              type="text" 
+              [(ngModel)]="registerData.firstName" 
+              name="firstName" 
+              placeholder="Your first name"
+              required 
+              (input)="clearFieldError('firstName'); validateRegisterFields()" />
+            <div class="error" *ngIf="registerErrors.firstName">{{ registerErrors.firstName }}</div>
+          </div>
+          <div class="form-group">
+            <label for="lastName">
+              <i class="fa fa-user-circle"></i>
+              Last Name
+            </label>
+            <input 
+              id="lastName" 
+              type="text" 
+              [(ngModel)]="registerData.lastName" 
+              name="lastName" 
+              placeholder="Your last name"
+              required 
+              (input)="clearFieldError('lastName'); validateRegisterFields()" />
+            <div class="error" *ngIf="registerErrors.lastName">{{ registerErrors.lastName }}</div>
+          </div>
         </div>
+
         <div class="form-group">
-          <label for="lastName">Last Name</label>
-          <input id="lastName" type="text" [(ngModel)]="registerData.lastName" name="lastName" required (input)="validateRegisterFields()" />
-          <div class="error" *ngIf="registerErrors.lastName">{{ registerErrors.lastName }}</div>
-        </div>
-        </div>
-        <div class="form-group">
-          <label for="nid">National ID</label>
-          <input id="nid" type="text" [(ngModel)]="registerData.nid" name="nid" required pattern="^[0-9]{14}$" (input)="validateRegisterFields()" />
+          <label for="nid">
+            <i class="fa fa-id-card"></i>
+            National ID
+          </label>
+          <input 
+            id="nid" 
+            type="text" 
+            [(ngModel)]="registerData.nid" 
+            name="nid" 
+            placeholder="14-digit national ID"
+            required 
+            pattern="^[0-9]{14}$" 
+            (input)="clearFieldError('nid'); validateRegisterFields()" />
           <div class="error" *ngIf="registerErrors.nid">{{ registerErrors.nid }}</div>
         </div>
+
         <div class="form-group">
-          <label for="email">Email</label>
-          <input id="email" type="email" [(ngModel)]="registerData.email" name="email" required email (input)="validateRegisterFields()" />
+          <label for="email">
+            <i class="fa fa-envelope"></i>
+            Email Address
+          </label>
+          <input 
+            id="email" 
+            type="email" 
+            [(ngModel)]="registerData.email" 
+            name="email" 
+            placeholder="Enter your email"
+            required 
+            email 
+            (input)="clearFieldError('email'); onEmailChange()" />
           <div class="error" *ngIf="registerErrors.email">{{ registerErrors.email }}</div>
         </div>
-        <div class="FandLname">
-        <div class="form-group password-group">
-          <label for="password">Password</label>
-          <div class="password-wrapper">
-            <input id="password" [type]="showRegisterPassword ? 'text' : 'password'" [(ngModel)]="registerData.password" name="password" required minlength="6" (input)="validateRegisterFields()" />
-            <span class="eye-icon" (click)="showRegisterPassword = !showRegisterPassword">
+
+        <div class="form-group">
+          <label for="password">
+            <i class="fa fa-lock"></i>
+            Password
+          </label>
+          <div class="password-input">
+            <input 
+              id="password" 
+              [type]="showRegisterPassword ? 'text' : 'password'" 
+              [(ngModel)]="registerData.password" 
+              name="password" 
+              placeholder="Create a strong password"
+              required 
+              minlength="6" 
+              (input)="clearFieldError('password'); validateRegisterFields()" />
+            <button type="button" class="password-toggle" (click)="showRegisterPassword = !showRegisterPassword">
               <i class="fa" [ngClass]="showRegisterPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-            </span>
+            </button>
           </div>
           <div class="error" *ngIf="registerErrors.password">{{ registerErrors.password }}</div>
+          
+          <!-- Password Requirements -->
+          <div class="password-requirements" *ngIf="registerData.password">
+            <div class="requirement" [class.valid]="getPasswordValidationDetails(registerData.password).hasMinLength">
+              <i class="fa" [ngClass]="getPasswordValidationDetails(registerData.password).hasMinLength ? 'fa-check' : 'fa-times'"></i>
+              At least 6 characters
+            </div>
+            <div class="requirement" [class.valid]="getPasswordValidationDetails(registerData.password).hasUpperCase">
+              <i class="fa" [ngClass]="getPasswordValidationDetails(registerData.password).hasUpperCase ? 'fa-check' : 'fa-times'"></i>
+              One uppercase letter
+            </div>
+            <div class="requirement" [class.valid]="getPasswordValidationDetails(registerData.password).hasLowerCase">
+              <i class="fa" [ngClass]="getPasswordValidationDetails(registerData.password).hasLowerCase ? 'fa-check' : 'fa-times'"></i>
+              One lowercase letter
+            </div>
+            <div class="requirement" [class.valid]="getPasswordValidationDetails(registerData.password).hasSpecialChar">
+              <i class="fa" [ngClass]="getPasswordValidationDetails(registerData.password).hasSpecialChar ? 'fa-check' : 'fa-times'"></i>
+              One special character
+            </div>
+          </div>
         </div>
-        <div class="form-group password-group">
-          <label for="confirmPassword">Confirm Password</label>
-          <div class="password-wrapper">
-            <input id="confirmPassword" [type]="showRegisterConfirmPassword ? 'text' : 'password'" [(ngModel)]="registerData.confirmPassword" name="confirmPassword" required (input)="validateRegisterFields()" />
-            <span class="eye-icon" (click)="showRegisterConfirmPassword = !showRegisterConfirmPassword">
+
+        <div class="form-group">
+          <label for="confirmPassword">
+            <i class="fa fa-lock"></i>
+            Confirm Password
+          </label>
+          <div class="password-input">
+            <input 
+              id="confirmPassword" 
+              [type]="showRegisterConfirmPassword ? 'text' : 'password'" 
+              [(ngModel)]="registerData.confirmPassword" 
+              name="confirmPassword" 
+              placeholder="Confirm your password"
+              required 
+              (input)="clearFieldError('confirmPassword'); validateRegisterFields()" />
+            <button type="button" class="password-toggle" (click)="showRegisterConfirmPassword = !showRegisterConfirmPassword">
               <i class="fa" [ngClass]="showRegisterConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-            </span>
+            </button>
           </div>
           <div class="error" *ngIf="registerErrors.confirmPassword">{{ registerErrors.confirmPassword }}</div>
         </div>
+
+        <div class="form-options">
+          <label class="checkbox-container">
+            <input type="checkbox" required>
+            <span class="checkmark"></span>
+            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+          </label>
         </div>
-        <button type="submit" class="btn">Register</button>
-        <div class="switch-link">
-          Already have an account?
-          <a (click)="toggleForm(true)">Log in</a>
+
+        <button type="submit" class="btn btn-primary">
+          <i class="fa fa-user-plus"></i>
+          Create Account
+        </button>
+
+        <div class="divider">
+          <span>or</span>
         </div>
+
+        <button type="button" class="btn btn-google">
+          <i class="fa fa-google"></i>
+          Continue with Google
+        </button>
       </form>
+    </div>
+
+    <!-- Messages -->
+    <div class="auth-messages">
+      <div class="success-message" *ngIf="successMsg">
+        <i class="fa fa-check-circle"></i>
+        {{ successMsg }}
+      </div>
+      <div class="error-message" *ngIf="errorMsg">
+        <i class="fa fa-exclamation-circle"></i>
+        {{ errorMsg }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OTP Verification Popup -->
+<div class="otp-popup-overlay" *ngIf="showOtpPopup" (click)="closeOtpPopup()">
+  <div class="otp-popup" (click)="$event.stopPropagation()">
+    <div class="otp-popup-header">
+      <div class="otp-icon">
+        <i class="fa fa-envelope-open"></i>
+      </div>
+      <h3>Verify Your Email</h3>
+      <p>We've sent a 6-digit code to</p>
+      <div class="email-display">{{ registerData.email }}</div>
+      <button class="close-btn" (click)="closeOtpPopup()">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="otp-popup-content">
+      <div class="otp-input-container">
+        <input
+          *ngFor="let i of [0,1,2,3,4,5]; let idx = index"
+          class="otp-input"
+          type="text"
+          maxlength="1"
+          pattern="[0-9]*"
+          [value]="otpCode[idx] || ''"
+          (input)="onOtpInput($event, idx)"
+          (keydown)="onOtpKeydown($event, idx)"
+          autocomplete="one-time-code"
+        />
+      </div>
+      
+      <div class="otp-messages">
+        <div class="error" *ngIf="otpError">
+          <i class="fa fa-exclamation-circle"></i>
+          {{ otpError }}
+        </div>
+        <div class="success" *ngIf="otpSuccess">
+          <i class="fa fa-check-circle"></i>
+          {{ otpSuccess }}
+        </div>
+      </div>
+      
+      <div class="otp-actions">
+        <button 
+          type="button" 
+          class="btn btn-primary" 
+          (click)="verifyOtp()"
+          [disabled]="isVerifyingOtp || otpCode.length !== 6"
+        >
+          <i class="fa fa-check" *ngIf="!isVerifyingOtp"></i>
+          <i class="fa fa-spinner fa-spin" *ngIf="isVerifyingOtp"></i>
+          {{ isVerifyingOtp ? 'Verifying...' : 'Verify Email' }}
+        </button>
+        
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="resendOtp()"
+          [disabled]="isVerifyingOtp"
+        >
+          <i class="fa fa-refresh"></i>
+          Resend Code
+        </button>
+      </div>
     </div>
   </div>
 </div>

@@ -1,41 +1,228 @@
 
+.slider-container {
+  position: relative;
+  padding: 10px 0 30px;
+  margin: 0 -10px;
+}
+
 .product-slider {
   max-width: 100%;
-  padding-left: 50px;
+  padding: 15px 5px 25px;
 }
 
-
-.product-slider .card {
-  max-width: 220px;
-  margin: auto;
-  border: none;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  border-radius: 10px;
-  overflow: hidden;
+.slider-controls {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 5px;
 }
 
-
-.product-slider .card-img-top {
-  height: 140px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-
-.swiper-button-next,
-.swiper-button-prev {
-  width: 30px;
-  height: 30px;
-  background-color: rgba(0, 0, 0, 0.05);
+.slider-arrow {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
+  background-color: white;
+  border: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: all 0.2s ease;
+  color: #5ba600;
 }
 
-.swiper-button-next::after,
-.swiper-button-prev::after {
+.slider-arrow:hover {
+  background-color: #5ba600;
+  color: white;
+  transform: scale(1.05);
+}
+
+.slider-arrow:focus {
+  outline: none;
+}
+
+.slider-arrow i {
   font-size: 14px;
-  color: #333;
+}
+
+.prev-arrow {
+  margin-left: 10px;
+}
+
+.next-arrow {
+  margin-right: 10px;
+}
+
+/* Hide default Swiper navigation */
+:host ::ng-deep .swiper-button-next,
+:host ::ng-deep .swiper-button-prev {
+  display: none !important;
+}
+
+/* Product card styling enhancements */
+:host ::ng-deep .product-card {
+  height: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+  position: relative;
+}
+
+:host ::ng-deep .product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+:host ::ng-deep .product-image {
+  height: 180px;
+  width: 100%;
+  object-fit: contain;
+  padding: 10px;
+  background-color: #f8f9fa;
+  transition: transform 0.3s ease;
+}
+
+:host ::ng-deep .product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+:host ::ng-deep .product-info {
+  padding: 15px;
+}
+
+:host ::ng-deep .product-brand {
+  font-size: 12px;
+  color: #6c757d;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+:host ::ng-deep .product-name {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  color: #212529;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 42px;
+}
+
+:host ::ng-deep .product-rating {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+:host ::ng-deep .stars {
+  color: #ffc107;
+  font-size: 12px;
+  margin-right: 5px;
+}
+
+:host ::ng-deep .review-count {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+:host ::ng-deep .product-price {
+  font-weight: 700;
+  color: #212529;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+:host ::ng-deep .product-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+:host ::ng-deep .add-to-cart {
+  background-color: #5ba600;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 15px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+:host ::ng-deep .add-to-cart:hover {
+  background-color: #4a8c00;
+}
+
+:host ::ng-deep .wishlist-btn {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 5px;
+  transition: transform 0.2s ease;
+}
+
+:host ::ng-deep .wishlist-btn:hover {
+  transform: scale(1.2);
+}
+
+:host ::ng-deep .product-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #5ba600;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 3px;
+  z-index: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  :host ::ng-deep .product-image {
+    height: 160px;
+  }
+}
+
+@media (max-width: 768px) {
+  .slider-arrow {
+    width: 35px;
+    height: 35px;
+  }
+  
+  :host ::ng-deep .product-image {
+    height: 140px;
+  }
+}
+
+@media (max-width: 576px) {
+  .slider-arrow {
+    width: 30px;
+    height: 30px;
+  }
+  
+  :host ::ng-deep .product-image {
+    height: 120px;
+  }
+  
+  :host ::ng-deep .product-name {
+    font-size: 13px;
+    height: 38px;
+  }
 }
 

@@ -9,7 +9,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class CartServices {
-  private apiUrl = `${environment.apiUrl}/cart`;
+  private apiUrl = `${environment.apiUrl}/Cart`;
   private cartCount = new BehaviorSubject<number>(0);
 
   constructor(private http: HttpClient) {
@@ -21,10 +21,10 @@ export class CartServices {
   }
 
   private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('auth_token');
     if (!token) {
       console.error('Token not found. User might not be logged in.');
-      throw new Error('User is not logged in');
+      // throw new Error('User is not logged in');
     }
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`

@@ -1,12 +1,23 @@
-<swiper-container
-  slides-per-view="4"
-  space-between="15"
-  navigation="true"
-  pagination="false"
->
-  <swiper-slide *ngFor="let category of categories">
-    <div class="category-slide">
-      <span class="category-name">{{ category.name }}</span>
-    </div>
-  </swiper-slide>
-</swiper-container>
+<div class="category-slider-container">
+  <div class="slider-controls">
+    <button class="slider-arrow prev-arrow" (click)="slidePrev()">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <button class="slider-arrow next-arrow" (click)="slideNext()">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <swiper-container #swiperContainer init="false" class="category-slider">
+    <swiper-slide *ngFor="let category of categories">
+      <a [routerLink]="['/productsList']" [queryParams]="{category: category.name}" class="category-card">
+        <div class="category-icon">
+          <i class="fas" [ngClass]="getCategoryIcon(category.name)"></i>
+        </div>
+        <div class="category-info">
+          <h4 class="category-name">{{ category.name }}</h4>
+        </div>
+      </a>
+    </swiper-slide>
+  </swiper-container>
+</div>
