@@ -1,0 +1,10 @@
+.chat-window {
+  height: 400px;
+  overflow-y: auto;
+}
+.sent {
+  text-align: right;
+}
+.received {
+  text-align: left;
+}

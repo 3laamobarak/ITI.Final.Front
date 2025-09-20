@@ -11,6 +11,8 @@ import { LoginRegister } from './Components/login-register/login-register';
 import { VerifyEmail } from './Components/verify-email/verify-email';
 import { Profile } from './Components/profile/profile';
 import {noAuthGuard} from './Guards/no-auth-guard';
+import {verifydoneGuard} from './Guards/verifydone-guard';
+import {Chat} from './Components/chat/chat';
 import {authGuard} from './Guards/auth-guard';
 
 export const routes: Routes = [
@@ -50,8 +52,9 @@ export const routes: Routes = [
     {path: 'profile/security' , component: Profile , title: 'Security Settings' , canActivate: [authGuard]},
 
     {path: 'NotFound' , component: NotFound},
-    {path: 'login-register' , component: LoginRegister , title: 'Login / Register' , canActivate: [noAuthGuard]},
-    {path: 'verify-email' , component: VerifyEmail , title: 'Verify Email' , canActivate: [noAuthGuard]},
+    {path: 'login-register' , component: LoginRegister , title: 'Login / Register'  ,canActivate: [noAuthGuard]},
+    {path: 'verify-email' , component: VerifyEmail , title: 'Verify Email' , canActivate: [verifydoneGuard]},
+    {path:'chat' , component:Chat, title: 'Support Chat'},
 
     {path: '**', redirectTo: '/NotFound'}
 

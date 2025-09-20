@@ -5,18 +5,31 @@ import { environment } from '../../environments/environment';
 import { Iuser } from '../Models/iuser';
 import { User } from './user';
 import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class Auth {
   private apiUrl = `${environment.apiUrl}/account`;
+  private userId: string = '';
 
   constructor(
     private http: HttpClient,
     private user: User,
     private router: Router
   ) {}
+
+  public getHttp(): HttpClient {
+    return this.http;
+  }
+
+  async fetchUserId(): Promise<string> {
+    if (this.userId) return this.userId;
+    const profile = await firstValueFrom(this.http.get(`${environment.apiUrl}/profile/me`));
+    this.userId = (profile as any).id;
+    return this.userId;
+  }
 
   register(data: Iuser): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
