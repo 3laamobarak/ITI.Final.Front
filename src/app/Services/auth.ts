@@ -33,20 +33,14 @@ export class Auth {
 
   register(data: Iuser): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post(`${this.apiUrl}/register`, data, { headers }).pipe(
-      tap((res: any) => {
-        // Save email for verification
-        if (data.email) {
-          sessionStorage.setItem('verify_email', data.email);
-        }
-        // Navigate to verify email page
-        this.router.navigate(['/verify-email']);
-      })
-    );
+    console.log('Auth service - API URL:', this.apiUrl);
+    console.log('Auth service - Full URL:', `${this.apiUrl}/Register`);
+    console.log('Auth service - Data being sent:', data);
+    return this.http.post(`${this.apiUrl}/Register`, data, { headers });
   }
 
   login(data: any): Observable<any> {
-    return this.http.post<{ token: string }>(`${this.apiUrl}/login`, data).pipe(
+    return this.http.post<{ token: string }>(`${this.apiUrl}/Login`, data).pipe(
       tap((res) => {
         if (res && res.token) {
           this.user.setToken(res.token);

@@ -1,7 +1,6 @@
 export interface ICategory {
-
-   name: string ;
-    description?: string; 
-   products?: string[] ;
-   subcategories: string[]
+  id?: number;
+  name: string;
+  description?: string;
+  subcategories?: string[];
 }

@@ -4,10 +4,11 @@ import { Header } from "./Components/header/header";
 import { Footer } from "./Components/footer/footer";
 import { RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
+import { ChatBotComponent } from './Components/chat-bot/chat-bot.component';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, Header, Footer, RouterOutlet],
+  imports: [CommonModule, Header, Footer, RouterOutlet,ChatBotComponent ],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

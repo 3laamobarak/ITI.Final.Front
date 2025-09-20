@@ -1,78 +1,457 @@
 <!-- Top Bar -->
-
-<div
-  class="top-bar d-flex justify-content-between align-items-center px-4 py-1 bg-light small"
->
-
-  <div class="offer text-success">🌿 10% off your first order!</div>
+<div class="top-bar d-flex justify-content-between align-items-center px-4 py-1 bg-light small">
+  <div class="offer text-success">
+    <i class="fas fa-tag me-1"></i> 29% Off Sitewide Ends 03:41:27
+  </div>
   <div class="d-flex align-items-center">
-    <span class="me-3"> English | Egypt</span>
+    <div class="language-selector me-3">
+      <span>EG | EN | EGP</span>
+    </div>
     <span class="share-icon">
-      <i class="fa-solid fa-share-nodes text-warning"></i>
+      <i class="fas fa-share-alt text-secondary"></i>
     </span>
   </div>
 </div>
 
 <!-- Middle Bar -->
-
-<div class="middle-bar d-flex justify-content-between align-items-center px-4 py-2 bg-success">
+<div class="middle-bar d-flex justify-content-between align-items-center px-4 py-2">
   <!-- Logo -->
   <div class="logo">
-    <a [routerLink]="'/home'" class="text-white fw-bold fs-2 text-decoration-none logo-link">
-      FitZone
+    <a [routerLink]="'/home'" class="logo-link">
+      <svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" class="logo-img">
+        <defs>
+          <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#5ba600;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#4c8c00;stop-opacity:1" />
+          </linearGradient>
+          <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#5ba600;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#4c8c00;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#3d7000;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        
+        <!-- Background circle for icon -->
+        <circle cx="30" cy="30" r="25" fill="url(#iconGradient)" opacity="0.1"/>
+        
+        <!-- Main icon - stylized "F" with fitness elements -->
+        <g transform="translate(15, 15)">
+          <!-- Vertical bar of F -->
+          <rect x="0" y="0" width="4" height="30" rx="2" fill="url(#iconGradient)"/>
+          
+          <!-- Top horizontal bar of F -->
+          <rect x="0" y="0" width="20" height="4" rx="2" fill="url(#iconGradient)"/>
+          
+          <!-- Middle horizontal bar of F -->
+          <rect x="0" y="13" width="15" height="4" rx="2" fill="url(#iconGradient)"/>
+          
+          <!-- Fitness accent - small dumbbell -->
+          <g transform="translate(22, 8)">
+            <rect x="0" y="6" width="8" height="2" rx="1" fill="url(#iconGradient)"/>
+            <circle cx="2" cy="7" r="2" fill="url(#iconGradient)"/>
+            <circle cx="6" cy="7" r="2" fill="url(#iconGradient)"/>
+          </g>
+          
+          <!-- Health accent - leaf -->
+          <g transform="translate(22, 18)">
+            <path d="M2,0 Q4,2 2,4 Q0,2 2,0" fill="url(#iconGradient)" opacity="0.8"/>
+            <line x1="2" y1="4" x2="2" y2="6" stroke="url(#iconGradient)" stroke-width="1" opacity="0.8"/>
+          </g>
+        </g>
+        
+        <!-- Company name -->
+        <text x="70" y="25" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="url(#logoGradient)">
+          FitZone
+        </text>
+        
+        <!-- Tagline -->
+        <text x="70" y="42" font-family="Arial, sans-serif" font-size="10" font-weight="400" fill="#666" opacity="0.8">
+          HEALTH & FITNESS
+        </text>
+      </svg>
     </a>
   </div>
 
   <!-- Search Input -->
-  <!-- header.html -->
-  <div class="flex-grow-1 mx-3 position-relative">
-    <div class="input-group">
+  <div class="header-wrapper">
+    <div class="input-holder" [class.active]="showPanel">
+      <i class="fas fa-search search-icon"></i>
       <input
         #searchInput
         type="text"
-        class="form-control rounded-5 pe-5"
-        placeholder="Search for a product or ingredient..."
+        class="search-input"
+        placeholder="Search all of FitZone"
+        (input)="onInput(searchInput.value)"
         (keyup.enter)="onSearch(searchInput.value)"
+        (focus)="onFocus()"
+        (keydown)="onKeyDown($event)"
+        [value]="query"
+        aria-label="Search products"
+        aria-haspopup="listbox"
+        [attr.aria-expanded]="showPanel ? 'true' : 'false'"
       />
-      <span
-        class="position-absolute top-50 end-0 translate-middle-y me-3 text-muted"
-        style="cursor: pointer"
-        (click)="onSearch(searchInput.value)"
+      <button
+        *ngIf="query"
+        class="btn-clear"
+        type="button"
+        (click)="clearSearch()"
+        aria-label="clear search"
       >
+        <i class="fas fa-times"></i>
+      </button>
+      <button
+        class="btn-search"
+        type="button"
+        (click)="onSearch(searchInput.value)"
+        aria-label="search"
+      >
+        <span>Search</span>
+      </button>
+    </div>
 
-        <i class="fas fa-search"></i>
-      </span>
+    <!-- Overlay (darken background) -->
+    <div class="overlay" *ngIf="showPanel" (click)="closePanel()"></div>
+
+    <!-- Panel -->
+    <div
+      class="search-panel"
+      *ngIf="showPanel"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="panel-left">
+        <!-- Search history -->
+        <div class="panel-section" *ngIf="searchHistory?.length">
+          <div class="section-header">
+            <span>Search history</span>
+            <button class="clear-btn" (click)="clearHistory()">Clear</button>
+          </div>
+          <ul class="history-list" role="list">
+            <li *ngFor="let h of searchHistory.slice(0, 5); let i = index" role="listitem">
+              <a (click)="onSearch(h)" class="history-item">
+                <i class="fas fa-history"></i>
+                <span>{{ h }}</span>
+              </a>
+              <button class="x" (click)="removeHistoryItem(i)">✕</button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Suggestions -->
+        <div class="panel-section">
+          <div class="section-header">
+            <span>Suggestions</span>
+            <div *ngIf="isLoading" class="spinner-border spinner-border-sm text-success" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+
+          <ul class="suggest-list" role="listbox" *ngIf="!isLoading">
+            <li
+              *ngFor="let s of suggestions; let i = index"
+              id="sug-{{ i }}"
+              role="option"
+              [attr.aria-selected]="highlightedIndex === i"
+              (click)="onSelectSuggestion(s)"
+              [class.active]="highlightedIndex === i"
+            >
+              <div class="s-name">
+                <i class="fas fa-search text-muted me-2"></i>
+                {{ s.name }}
+              </div>
+            </li>
+
+            <li
+              *ngIf="!suggestions?.length && query && !isLoading"
+              class="no-suggest"
+            >
+              No suggestions for "{{ query }}"
+            </li>
+            
+            <li
+              *ngIf="!suggestions?.length && !query && !searchHistory?.length"
+              class="no-suggest"
+            >
+              Type to search products
+            </li>
+          </ul>
+        </div>
+
+        <!-- Trending (optional) -->
+        <div class="panel-section" *ngIf="trending?.length">
+          <div class="section-header"><span>Trending now</span></div>
+          <div class="trending-chips">
+            <button
+              class="chip"
+              *ngFor="let t of trending"
+              (click)="onSelectTrending(t)"
+            >
+              <i class="fas fa-fire-alt text-danger me-1"></i>
+              {{ t }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-right">
+        <div class="section-header">
+          <span>Browse Categories</span>
+          <i class="fas fa-layer-group text-success"></i>
+        </div>
+        <div class="categories-grid">
+          <div
+            class="cat-tile"
+            *ngFor="let c of categories; let i = index"
+            (click)="onSelectCategory(c)"
+            [style.animation-delay]="(i * 0.1) + 's'"
+          >
+            <div class="cat-icon">
+              <i [class]="getCategoryIcon(c.name)"></i>
+            </div>
+            <div class="cat-content">
+              <span class="cat-name">{{ c.name }}</span>
+              <span class="cat-count">{{ c.subcategories?.length || 0 }} items</span>
+            </div>
+            <i class="fas fa-chevron-right cat-arrow"></i>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-
-
   <!-- Right Actions -->
-  <div class="d-flex align-items-center">
-    <a routerLink="/login-register" class="me-3 text-white text-decoration-none"> <i class="fas fa-user text-white"></i>
-      Sign In</a>
-    <a routerLink="/cart" class="text-dark text-decoration-none"><i class="fas fa-shopping-cart text-white"></i>
-    </a>
+  <div class="user-actions">
+    <!-- User Account - Show different UI based on login status -->
+    <div class="user-account">
+      <!-- If not logged in, show login/register button -->
+      <a *ngIf="!isLoggedIn" routerLink="/login-register" class="account-link">
+        <i class="fas fa-user"></i>
+        <div class="account-text">
+          <span class="action">Login / Register</span>
+        </div>
+      </a>
+
+      <!-- If logged in, show profile dropdown -->
+      <div *ngIf="isLoggedIn" class="profile-dropdown">
+        <button class="profile-button" (click)="toggleProfileMenu($event)">
+          <i class="fas fa-user-circle"></i>
+          <div class="account-text">
+            <span class="greeting">Hi, {{userName}}</span>
+            <span class="action">My Account <i class="fas fa-chevron-down"></i></span>
+          </div>
+        </button>
+
+        <!-- Profile dropdown menu -->
+        <div class="profile-menu" *ngIf="showProfileMenu">
+          <div class="profile-header">
+            <span>Welcome</span>
+            <h5>{{userName}}!</h5>
+          </div>
+          
+          <div class="menu-items">
+            <a routerLink="/profile" class="menu-item">
+              <i class="fas fa-user"></i>
+              <span>My Account</span>
+            </a>
+            <a routerLink="/profile/orders" class="menu-item">
+              <i class="fas fa-box"></i>
+              <span>Orders</span>
+            </a>
+           
+            <a routerLink="/profile/reviews" class="menu-item">
+              <i class="fas fa-star"></i>
+              <span>My Reviews</span>
+            </a>
+           
+            <a routerLink="/profile/account" class="menu-item">
+              <i class="fas fa-cog"></i>
+              <span>Account Settings</span>
+            </a>
+            <a routerLink="/profile/addresses" class="menu-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Address Book</span>
+            </a>
+            <a routerLink="/profile/payment" class="menu-item">
+              <i class="fas fa-credit-card"></i>
+              <span>Payment Methods</span>
+            </a>
+          
+            <a routerLink="/profile/refunds" class="menu-item">
+              <i class="fas fa-undo"></i>
+              <span>Refunds</span>
+            </a>
+            <button class="menu-item logout-btn" (click)="logout()">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cart Container -->
+    <div class="cart-container">
+      <a routerLink="/cart" class="cart-link">
+        <i class="fas fa-shopping-cart"></i>
+        <span *ngIf="cartCount > 0" class="cart-badge">{{ cartCount }}</span>
+      </a>
+    </div>
   </div>
 </div>
 
 <!-- Main Navigation -->
-
-<div style="width: 100%; background-color: #f8f9fa; border-bottom: 1px solid #ddd;">
-  <nav class="main-nav px-4">
-    <ul class="nav">
-      <li class="nav-item dropdown" *ngFor="let category of categories">
-        <a class="nav-link text-black " href="#" role="button" data-bs-toggle="dropdown"
-          style="padding-right: 10px; padding-left: 10px;">
-          {{ category.name }}
+<div class="nav-container">
+  <nav class="main-nav">
+    <ul class="categories-nav">
+      <li class="nav-item" *ngFor="let category of categories; let i = index">
+        <a class="nav-link" href="javascript:void(0)" (click)="openMega(i, $event)">
+          <i [class]="getCategoryIcon(category.name)" class="nav-icon"></i>
+          <span>{{ category.name }}</span>
+          <i class="fas fa-chevron-down dropdown-icon"></i>
         </a>
-        <ul class="dropdown-menu">
-          <li *ngFor="let sub of category.subcategories">
-            <a class="dropdown-item" href="#">{{ sub }}</a>
-          </li>
-        </ul>
+
+        <!-- Enhanced Mega Menu Panel -->
+        <div class="mega-panel" *ngIf="openIndex === i" (click)="$event.stopPropagation()">
+          <div class="mega-header">
+            <div class="mega-category-info">
+              <div class="mega-category-icon">
+                <i [class]="getCategoryIcon(category.name)"></i>
+              </div>
+              <div class="mega-category-details">
+                <h5 class="mega-category-name">{{ category.name }}</h5>
+                <p class="mega-category-desc">Explore our {{ category.name.toLowerCase() }} collection</p>
+              </div>
+            </div>
+            <button class="mega-close-btn" (click)="openIndex = null">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          
+          <div class="mega-inner">
+            <!-- Products Grid -->
+            <div class="mega-col products-col">
+              <h6 class="mega-title">
+                <i class="fas fa-box me-2"></i>
+                Featured Products
+              </h6>
+              
+              <!-- Loading State -->
+              <div *ngIf="loadingProducts" class="products-loading">
+                <div class="loading-spinner">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <span>Loading products...</span>
+                </div>
+              </div>
+              
+              <!-- Products Grid -->
+              <div *ngIf="!loadingProducts && categoryProducts.length > 0" class="products-grid">
+                <div 
+                  *ngFor="let product of categoryProducts" 
+                  class="product-card"
+                  (click)="onSelectProduct(product)"
+                >
+                  <div class="product-image">
+                    <img 
+                      [src]="product.imageUrl || '/assets/default-product.svg'" 
+                      [alt]="product.name"
+                      loading="lazy"
+                    />
+                    <div class="product-overlay">
+                      <i class="fas fa-eye"></i>
+                    </div>
+                  </div>
+                  <div class="product-info">
+                    <h6 class="product-name">{{ product.name }}</h6>
+                    <div class="product-price">
+                      <span class="current-price">${{ product.price || 0 }}</span>
+                      <span *ngIf="product.originalPrice && product.originalPrice > product.price" 
+                            class="original-price">${{ product.originalPrice }}</span>
+                    </div>
+                    <div class="product-rating" *ngIf="product.averageRating">
+                      <i class="fas fa-star" *ngFor="let star of [1,2,3,4,5]" 
+                         [class.filled]="star <= (product.averageRating || 0)"></i>
+                      <span class="rating-count">({{ product.reviews || 0 }})</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- No Products State -->
+              <div *ngIf="!loadingProducts && categoryProducts.length === 0" class="no-products">
+                <i class="fas fa-box-open"></i>
+                <p>No products available in this category</p>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="mega-col right-col">
+              <h6 class="mega-title">
+                <i class="fas fa-bolt me-2"></i>
+                Quick Actions
+              </h6>
+              <ul class="mega-list">
+                <li>
+                  <a (click)="onSelectCategory(category)" class="mega-link featured">
+                    <i class="fas fa-th-large me-2"></i>
+                    View All {{ category.name }}
+                  </a>
+                </li>
+                <li>
+                  <a (click)="onSelectCategory(category)" class="mega-link">
+                    <i class="fas fa-percent me-2"></i>
+                    On Sale Items
+                  </a>
+                </li>
+                <li>
+                  <a (click)="onSelectCategory(category)" class="mega-link">
+                    <i class="fas fa-star me-2"></i>
+                    Top Rated
+                  </a>
+                </li>
+                <li>
+                  <a (click)="onSelectCategory(category)" class="mega-link">
+                    <i class="fas fa-fire me-2"></i>
+                    New Arrivals
+                  </a>
+                </li>
+              </ul>
+              
+              <div class="mega-trending">
+                <h6 class="mega-title">
+                  <i class="fas fa-trending-up me-2"></i>
+                  Trending
+                </h6>
+                <div class="trending-chips">
+                  <button class="trending-chip" *ngFor="let t of trending" (click)="onSelectTrending(t)">
+                    <i class="fas fa-fire-alt me-1"></i>
+                    {{ t }}
+                  </button>
+                </div>
+              </div>
+              
+              <div class="mega-stats">
+                <div class="stat-item">
+                  <span class="stat-number">{{ categoryProducts.length }}+</span>
+                  <span class="stat-label">Products</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">4.8</span>
+                  <span class="stat-label">Rating</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </li>
     </ul>
-  </nav>
 
+    <ul class="special-nav">
+      <li class="nav-item"><a class="nav-link" data-filter="specials" (click)="onSpecialFilter('specials')">Specials</a></li>
+      <li class="nav-item"><a class="nav-link" (click)="onSpecialFilter('best-sellers')">Best Sellers</a></li>
+      <li class="nav-item"><a class="nav-link" (click)="onSpecialFilter('try')">Try</a></li>
+      <li class="nav-item"><a class="nav-link" (click)="onSpecialFilter('new')">New</a></li>
+      <li class="nav-item"><a class="nav-link" data-filter="wellness" (click)="onSpecialFilter('wellness')">Wellness Hub</a></li>
+    </ul>
+  </nav>
 </div>

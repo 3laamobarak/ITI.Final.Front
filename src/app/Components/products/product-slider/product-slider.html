@@ -1,5 +1,16 @@
-<swiper-container #swiperContainer init="false" class="product-slider p-5">
-  <swiper-slide *ngFor="let product of products">
-    <app-product-card [product]="product"></app-product-card>
-  </swiper-slide>
-</swiper-container>
+<div class="slider-container">
+  <div class="slider-controls">
+    <button class="slider-arrow prev-arrow" (click)="slidePrev()">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <button class="slider-arrow next-arrow" (click)="slideNext()">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+  
+  <swiper-container #swiperContainer init="false" class="product-slider">
+    <swiper-slide *ngFor="let product of products">
+      <app-product-card [product]="product"></app-product-card>
+    </swiper-slide>
+  </swiper-container>
+</div>

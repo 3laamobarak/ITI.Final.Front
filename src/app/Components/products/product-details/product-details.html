@@ -1,133 +1,395 @@
-<!-- Product Page Layout -->
-<section *ngIf="!loading && product" class="product-page my-5">
-  <!-- ====== Gallery ====== -->
-  <div class="gallery">
+  <!-- ✅ Loading Spinner -->
+  <div *ngIf="loading" class="spinner">
+    <div class="loader"></div>
+    <p>Loading product details...</p>
+  </div>
 
-      <!-- main image -->
-    <div class="main-image">
-      <img [src]="galleryImages[activeImageIndex]" [alt]="product.name">
-    </div>
+
+
+
+  <!-- Product Page Layout -->
+  <section *ngIf="!loading && product" class="product-page my-5">
+    <!-- ====== Gallery ====== -->
+    <div class="gallery">
+
+        <!-- main image -->
+      <div class="main-image">
+        <img [src]="galleryImages[activeImageIndex]" [alt]="product.name">
+      </div>
+      
+      <!-- thumbnails -->
+      <div class="thumbs">
+        <img *ngFor="let img of galleryImages; let i = index"
+            [src]="img"
+            [class.active]="i === activeImageIndex"
+            (click)="activeImageIndex = i">
+      </div>
+
     
-    <!-- thumbnails -->
-    <div class="thumbs">
-      <img *ngFor="let img of galleryImages; let i = index"
-           [src]="img"
-           [class.active]="i === activeImageIndex"
-           (click)="activeImageIndex = i">
     </div>
 
-  
-  </div>
-
-  <!-- ====== Product Details ====== -->
-  <div class="details">
-    <h1 class="name">{{ product.name }}</h1>
-    <div class="rating" [innerHTML]="getStars(product.averageRating ?? 0)"></div>
-    <div class="stock" [class.in-stock]="product.stockQuantity">
-      {{ product.stockQuantity ? 'In Stock' : 'Out of Stock' }}
-    </div>
-
-    <div class="description">
-      <div [innerHTML]="product.description"></div>
-      <ul>
-        <li><strong>100% authentic</strong></li>
-        <li><strong>Best by:</strong> 05/2029</li>
-        <li><strong>First available:</strong> 05/2007</li>
-        <li><strong>Shipping weight:</strong> 0.26 kg</li>
-        <li><strong>Product code:</strong> NOW-00035</li>
-        <li><strong>UPC:</strong> 733739000354</li>
-        <li><strong>Package quantity:</strong> 120 Count</li>
-        <li><strong>Dimensions:</strong> 11.9 x 6.9 x 6.9 cm, 0.26 kg</li>
+    <!-- ====== Product Details ====== -->
+    <div class="details">
+      <h1 class="name">{{ product.name }}</h1>
+      
+      <!-- Product Badges -->
+      <div class="badges">
+        <span class="badge green">100% Authentic</span>
+        <span class="badge blue">Free Shipping</span>
+        <span class="badge gray" *ngIf="(product.reviews || 0) > 10">Best Seller</span>
+        <span class="badge orange" *ngIf="(product.averageRating || 0) >= 4.5">Highly Rated</span>
+      </div>
+      
+      <div class="rating-section">
+        <div class="rating-main">
+          <div class="rating" [innerHTML]="getStars(product.averageRating ?? 0)"></div>
+          <div class="rating-number">
+            <span class="rating-value">{{ (product.averageRating || 0) | number:'1.1-1' }}</span>
+            <span class="rating-out-of">/ 5.0</span>
+          </div>
+        </div>
+        <div class="rating-details">
+          <div class="rating-count">
+            <span class="count-number">{{ product.reviews || 0 }}</span>
+            <span class="count-text">{{ (product.reviews || 0) === 1 ? 'review' : 'reviews' }}</span>
+          </div>
+          <div class="rating-summary" [class]="getRatingColorClass()">{{ getRatingSummary() }}</div>
+        </div>
+        <div class="rating-insights" *ngIf="getRatingInsights().length > 0">
+          <div class="insight-item" *ngFor="let insight of getRatingInsights()">
+            <i class="fas fa-check-circle"></i>
+            <span>{{ insight }}</span>
+          </div>
+          <div class="insight-item">
+            <i class="fas fa-chart-line"></i>
+            <span>{{ getRatingComparison() }}</span>
+          </div>
+          <div class="insight-item">
+            <i class="fas fa-info-circle"></i>
+            <span>{{ getRatingTrend() }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="stock" [class.in-stock]="product.stockQuantity">
+        {{ product.stockQuantity ? 'In Stock' : 'Out of Stock' }}
+      </div>
+      
+      <!-- Product Meta -->
+      <ul class="meta">
+        <!-- <li><strong>Brand:</strong> {{ product.brandName || 'Premium Brand' }}</li> -->
+        <li><strong>SKU:</strong> {{ product.id }}</li>
+        <!-- <li><strong>Category:</strong> {{ product.categoryName || 'Supplements' }}</li> -->
+        <li><strong>Weight:</strong> 0.26 kg</li>
       </ul>
+
+      <div class="description">
+        <ul>
+          <li><strong>100% authentic</strong></li>
+          <li><strong>Best by:</strong> 05/2029</li>
+          <li><strong>First available:</strong> 05/2007</li>
+          <li><strong>Shipping weight:</strong> 0.26 kg</li>
+          <li><strong>Product code:</strong> NOW-00035</li>
+          <li><strong>UPC:</strong> 733739000354</li>
+          <li><strong>Package quantity:</strong> 120 Count</li>
+          <li><strong>Dimensions:</strong> 11.9 x 6.9 x 6.9 cm, 0.26 kg</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ====== Buy Box ====== -->
+    <div class="buy-box">
+      <div class="price-line">
+        <span class="price">{{ product.price | currency:'EGP' }}</span> <br>
+        <span class="per-serving" *ngIf="product.price">
+          ({{ product.price | currency:'EGP' }}/serving)
+        </span>
+      </div>
+
+      <div class="quantity ">
+        <button (click)="decreaseQty()">-</button>
+        <input type="number" [(ngModel)]="qty" min="1">
+        <button (click)="increaseQty()">+</button>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" (click)="addToCart(product, qty)" [disabled]="!product.stockQuantity">
+          <!-- cart icon -->
+          <i class="fas fa-shopping-cart"></i>
+          Add to Cart
+        </button>
+      </div>
+
+      <div class="add-to-lists">
+        <button class="btn secondary" (click)="addToWishlist(product)">
+          <!-- heart icon -->
+          <i class="fas fa-heart"></i>
+          Add to Wishlist
+        </button>
+      </div>
+      
+      <!-- Trust Indicators -->
+      <div class="trust-row">
+        <div class="trust-item">
+          <i class="fas fa-shield-alt"></i>
+          <div>Secure Payment</div>
+        </div>
+        <div class="trust-item">
+          <i class="fas fa-truck"></i>
+          <div>Free Shipping</div>
+        </div>
+        <div class="trust-item">
+          <i class="fas fa-undo"></i>
+          <div>Easy Returns</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- product overview -->
+ <div id="overview" class="product-overview">
+    <div class="product-header">Product overview</div>
+    <div class="overview-grid">
+      
+      <!-- Left Column -->
+      <div>
+        <div class="section">
+          <h4>Description</h4>
+          <p>- {{product?.description}}</p>
+          <p>- Molecularly Distilled</p>
+          <p>- Eye & Immune Health</p>
+          <p>- Dietary Supplement</p>
+          <p>- Gluten Free</p>
+          <p>Bluebonnet’s Vitamin A 3000 mcg (10,000 IU) Softgels are formulated with vitamin A from molecularly distilled, deep sea, cold water fish liver oil to help support eye health and immune function.</p>
+        </div>
+
+        <div class="section">
+          <h4>Suggested use</h4>
+          <p> {{product?.SuggestedUse}}As a dietary supplement, take one softgel daily, preferably with a meal or as directed by a healthcare practitioner.</p>
+        </div>
+
+        <div class="section">
+          <h4>Warnings</h4>
+          <p>Store tightly closed in a cool, dry place. {{product?.Warnings}}</p>
+          <p>For adults only. Consult physician if pregnant/nursing, taking medication, or have a medical condition. Keep out of reach of children.</p>
+        </div>
+
+        <div class="section disclaimer">
+          <h4>Disclaimer</h4>
+          <p> {{product?.Disclaimer}}While iHerb strives to ensure the accuracy of its product images and information, some manufacturing changes to packaging and/or ingredients may be pending update on our site. Although items may occasionally ship with alternate packaging, freshness is always guaranteed. We recommend that you read labels, warnings and directions of all products before use and not rely solely on the information provided by iHerb.</p>
+        </div>
+
+        <div class="link">
+          <a href="#">Visit manufacturer's website</a>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div>
+        <div class="supplement-facts">
+          <h4>Supplement facts</h4>
+          <table class="supplement-table">
+            <tr>
+              <th colspan="2">Serving Size: 1 Softgel</th>
+            </tr>
+            <tr>
+              <th colspan="2">Servings per Container: 100</th>
+            </tr>
+            <tr>
+              <th>Amount Per Serving</th>
+              <th>% Daily Value</th>
+            </tr>
+            <tr>
+              <td>Vitamin A (from 10,000 IU fish liver oil) 3000 mcg</td>
+              <td>333%</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- ====== Buy Box ====== -->
-  <div class="buy-box">
-    <div class="price-line">
-      <span class="price">{{ product.price | currency:'EGP' }}</span> <br>
-      <span class="per-serving" *ngIf="product.price">
-        ({{ product.price | currency:'EGP' }}/serving)
-      </span>
+
+
+  <!-- Recommended Products -->
+  <section class="recommended-section">
+    <div class="section-header">
+      <div class="header-content">
+        <h3>Recommended for You</h3>
+        <p>Products you might also like</p>
+      </div>
+      <a routerLink="/productsList" class="view-all-link">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="slider-wrapper">
+      <div *ngIf="loadingRecommended" class="slider-loading">
+        <div class="loading-spinner">
+          <div class="spinner"></div>
+          <p>Loading recommended products...</p>
+        </div>
+      </div>
+      <app-product-slider *ngIf="!loadingRecommended" class="enhanced-slider" [products]="recommendedProducts"></app-product-slider>
+    </div>
+  </section>
+
+  <!-- Reviews Section -->
+  <section id="reviews" class="reviews-section">
+    <div class="reviews-header">
+      <h3>Customer Reviews</h3>
+      <div class="aggregate" *ngIf="product">
+        <span class="agg-stars" [innerHTML]="getStars(product.averageRating ?? 0)"></span>
+        <span class="agg-text">
+          {{ (product.averageRating || 0) | number:'1.1-1' }}/5 
+          ({{ product.reviews || 0 }} {{ (product.reviews || 0) === 1 ? 'review' : 'reviews' }})
+        </span>
+      </div>
     </div>
 
-    <div class="quantity ">
-      <button (click)="decreaseQty()">-</button>
-      <input type="number" [(ngModel)]="qty" min="1">
-      <button (click)="increaseQty()">+</button>
+    <!-- Controls and breakdown -->
+    <div class="reviews-toolbar">
+      <div class="filters">
+        <button class="chip" [class.active]="starFilter === 0" (click)="setStarFilter(0)">All</button>
+        <button class="chip" [class.active]="starFilter === 5" (click)="setStarFilter(5)">5★</button>
+        <button class="chip" [class.active]="starFilter === 4" (click)="setStarFilter(4)">4★</button>
+        <button class="chip" [class.active]="starFilter === 3" (click)="setStarFilter(3)">3★</button>
+        <button class="chip" [class.active]="starFilter === 2" (click)="setStarFilter(2)">2★</button>
+        <button class="chip" [class.active]="starFilter === 1" (click)="setStarFilter(1)">1★</button>
+      </div>
+      <div class="sorter">
+        <label>Sort by</label>
+        <select [(ngModel)]="sortOption" (change)="changeSort(sortOption)">
+          <option value="newest">Newest</option>
+          <option value="highest">Highest rated</option>
+          <option value="lowest">Lowest rated</option>
+        </select>
+      </div>
     </div>
 
-    <div class="actions">
-      <button class="btn primary" (click)="addToCart(product, qty)" [disabled]="!product.stockQuantity">
-        <!-- cart icon -->
-        <i class="fas fa-shopping-cart"></i>
-        Add to Cart
-      </button>
+    <div class="rating-breakdown" *ngIf="reviews?.length">
+      <div class="breakdown-header">
+        <h4>Rating Distribution</h4>
+        <span class="total-reviews">{{ reviews.length }} total reviews</span>
+      </div>
+      <div class="breakdown-rows">
+        <div class="breakdown-row" *ngFor="let b of ratingBreakdown">
+          <span class="star-label">{{b.star}}★</span>
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="b.pct" [class]="'rating-' + b.star"></div>
+            </div>
+            <span class="percentage">{{ b.pct | number:'1.0-0' }}%</span>
+          </div>
+          <span class="count">{{b.count}}</span>
+        </div>
+      </div>
     </div>
 
-    <div class="add-to-lists">
-      <button class="btn secondary" (click)="addToWishlist(product)">
-        <!-- heart icon -->
-        <i class="fas fa-heart"></i>
-        Add to Wishlist
-      </button>
+    <div *ngIf="loadingReviews" class="reviews-loading">
+      <div class="skeleton review-skel" *ngFor="let s of [1,2,3]"></div>
+    </div>
+
+    <div *ngIf="!loadingReviews && reviews?.length === 0" class="no-reviews">
+      <div class="no-reviews-content">
+        <i class="fas fa-star" style="font-size: 2rem; color: #ddd; margin-bottom: 10px;"></i>
+        <h4>No reviews yet</h4>
+        <p>Be the first to review this product and help other customers make their decision.</p>
+      </div>
+    </div>
+
+    <ul class="reviews-list" *ngIf="!loadingReviews && filteredReviews?.length">
+      <li class="review-item" *ngFor="let r of pagedReviews" [class.own-review]="canDeleteReview(r)">
+        <div class="review-top">
+          <div class="review-user">
+            <div class="avatar" [class.own-avatar]="canDeleteReview(r)">{{ (r.userName || 'U')[0] | uppercase }}</div>
+            <div>
+              <div class="name">
+                {{ r.userName || 'User' }}
+                <span class="own-review-badge" *ngIf="canDeleteReview(r)">(You)</span>
+              </div>
+              <div class="date">{{ r.createdAt | date:'mediumDate' }}</div>
+            </div>
+          </div>
+          <div class="review-stars" [innerHTML]="getStars(r.rating)"></div>
+        </div>
+        <div class="review-comment">{{ r.comment }}</div>
+        <div class="review-actions">
+          <button class="link" [class.disabled]="hasVotedHelpful(r.id)" (click)="markHelpful(r.id)">
+            Helpful ({{ getHelpfulCount(r.id) }})
+          </button>
+          <button class="link danger" *ngIf="canDeleteReview(r)" (click)="deleteReview(r.id)">Delete</button>
+        </div>
+      </li>
+    </ul>
+
+    <div class="load-more" *ngIf="canLoadMore()">
+      <button class="btn secondary" (click)="loadMore()">Load more</button>
+    </div>
+
+    <div class="review-form-card">
+      <h4>Write a review</h4>
+      
+      <!-- User already reviewed -->
+      <div *ngIf="isLoggedIn && hasUserReviewed()" class="already-reviewed">
+        <div class="reviewed-message">
+          <i class="fas fa-check-circle"></i>
+          <span>You have already reviewed this product</span>
+        </div>
+        <div class="user-review-summary">
+          <div class="user-review-rating">
+            <span class="user-review-stars" [innerHTML]="getStars(getUserReview()?.rating || 0)"></span>
+            <span class="user-review-text">{{ getUserReview()?.rating }}/5</span>
+          </div>
+          <div class="user-review-comment">{{ getUserReview()?.comment }}</div>
+          <div class="user-review-date">Reviewed on {{ getUserReview()?.createdAt | date:'mediumDate' }}</div>
+        </div>
+        <button class="btn danger" (click)="deleteUserReview()">
+          <i class="fas fa-trash"></i>
+          Delete My Review
+        </button>
+      </div>
+      
+      <!-- User not logged in -->
+      <div *ngIf="!isLoggedIn" class="login-hint">
+        Please log in to submit a review.
+      </div>
+      
+      <!-- Review form for users who haven't reviewed -->
+      <div *ngIf="isLoggedIn && !hasUserReviewed()">
+        <div class="rating-picker">
+          <button type="button" *ngFor="let s of [1,2,3,4,5]"
+                  [class.active]="reviewForm.rating >= s"
+                  (click)="setRating(s)">★</button>
+        </div>
+        <textarea rows="4" [(ngModel)]="reviewForm.comment" placeholder="Share your experience..."></textarea>
+        <div class="error" *ngIf="reviewError">{{ reviewError }}</div>
+        <div class="success" *ngIf="reviewSuccess">{{ reviewSuccess }}</div>
+        <button class="btn primary" (click)="submitReview()" [disabled]="submittingReview">
+          {{ submittingReview ? 'Submitting...' : 'Submit Review' }}
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Floating Add to Cart Bar (Mobile) -->
+  <div class="floating-cart" *ngIf="!loading && product">
+    <div class="floating-cart-content">
+      <div class="floating-price">
+        <span class="price">{{ product.price | currency:'EGP' }}</span>
+        <div class="floating-rating">
+          <span class="floating-stars" [innerHTML]="getStars(product.averageRating ?? 0)"></span>
+          <span class="floating-rating-text">{{ (product.averageRating || 0) | number:'1.1-1' }}</span>
+        </div>
+        <span class="stock-indicator" [class.in-stock]="product.stockQuantity">
+          {{ product.stockQuantity ? 'In Stock' : 'Out of Stock' }}
+        </span>
+      </div>
+      <div class="floating-actions">
+        <button class="btn primary" (click)="addToCart(product, qty)" [disabled]="!product.stockQuantity">
+          <i class="fas fa-shopping-cart"></i>
+          Add to Cart
+        </button>
+      </div>
     </div>
   </div>
-</section>
 
-
-<!-- customer also viewed section -->
-<section class="also-viewed">
-  <h3 class="mb-1">Customers Also Viewed</h3> 
-  <!-- product slider component  -->
-  <app-product-slider [products]="productsAlsoViewed"></app-product-slider>
-</section>
-
-
-<!-- product overview -->
- <div class="m-5">
-  <h3>
-    Product Overview
-  </h3>
-  <p>{{product.description}}</p>
-  <p>Amino Acids
-Conditionally Essential Amino Acid
-Nitric Oxide Precursor
-Non-GMO
-A Dietary Supplement 
-Vegetarian/Vegan
-Kosher
-Family Owned Since 1968
-GMP Quality Assured
-Arginine is a conditionally essential basic amino acid involved primarily in urea metabolism and excretion, as well as in DNA synthesis and protein production. It is an important precursor of nitric oxide (NO) and thus plays a role in the dilation of blood vessels.
-
-Suggested use
-Take 1 tablet twice daily as needed. Take between meals or at bedtime with at least 8 oz. of water or juice to facilitate absorption. 
-
-Other ingredients
-Hydroxypropyl cellulose, microcrystalline cellulose, stearic acid (vegetable source), croscarmellose sodium, silicon dioxide and vegetarian coating.
-
-Not manufactured with wheat, gluten, soy, milk, egg, fish, shellfish or tree nut ingredients. Produced in a GMP facility that processes other ingredients containing these allergens.
-
-This product has twice the L-Arginine (1,000 mg per tablet) as in our regular strength product (500 mg per capsule). 
-
-The L-Arginine used in this product is pharmaceutical grade.
-
-Warnings
-Store in a cool, dry place after opening.
-
-Take this product with at least 8 oz. of water or juice. For adults only. Not for pregnant or nursing women. Consult physician if taking medication (especially antihypertensives, anticoagulants, and antidiabetic drugs), have a medical condition (especially asthma or renal disease) or are planning to have surgery. This product should be avoided by persons with glaucoma or herpes simplex unless otherwise prescribed by a physician. 
-
-Do not use if you have a myocardial infarction or have established coronary artery disease. Keep out of reach of children. 
-
-Natural color variation may occur in this product.
-
-Disclaimer
-While iHerb strives to ensure the accuracy of its product images and information, some manufacturing changes to packaging and/or ingredients may be pending update on our site. Although items may occasionally ship with alternate packaging, freshness is always guaranteed. We recommend that you read labels, warnings and directions of all products before use and not rely solely on the information provided by iHerb.</p>
- </div>
-
- <!-- Questions and answers -->
- <section class="m-5">
-  <h3>Questions and Answers</h3>
- </section>
 
