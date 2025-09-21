@@ -24,7 +24,7 @@ export class ChatBotComponent implements OnInit {
   newMessage = '';
   messages: ChatMessage[] = [];
   isLoading = false;
-  apiUrl = `${environment.apiUrl}/chat`;
+  apiUrl = `${environment.apiUrl}/chatbot`;
 
   constructor(private http: HttpClient, private userService: User) {}
 
@@ -43,29 +43,52 @@ export class ChatBotComponent implements OnInit {
     if (!this.userService.isLoggedIn()) return;
 
     this.isLoading = true;
-    this.http.get<ChatMessage[]>(`${this.apiUrl}/history`, {
+    this.http.get<any[]>(`${this.apiUrl}/history`, {
       headers: {
         'Authorization': `Bearer ${this.userService.getToken()}`
       }
     }).subscribe({
       next: (data) => {
-        this.messages = data;
+        // Convert backend format to frontend format
+        this.messages = data.map(msg => ({
+          id: msg.id,
+          message: msg.message,
+          sender: msg.sender as 'User' | 'Bot',
+          timestamp: msg.timestamp ? new Date(msg.timestamp) : new Date()
+        }));
         this.isLoading = false;
         this.scrollToBottom();
       },
       error: (error) => {
         console.error('Error loading chat history:', error);
         this.isLoading = false;
+        // Show a user-friendly message
+        this.messages = [{
+          message: 'Welcome! How can I help you today?',
+          sender: 'Bot'
+        }];
       }
     });
   }
 
   sendMessage(): void {
-    if (!this.newMessage.trim() || !this.userService.isLoggedIn()) return;
+    if (!this.newMessage.trim()) {
+      return;
+    }
+
+    if (!this.userService.isLoggedIn()) {
+      this.messages.push({
+        message: 'Please log in to use the chatbot.',
+        sender: 'Bot'
+      });
+      this.scrollToBottom();
+      return;
+    }
 
     const userMessage: ChatMessage = {
       message: this.newMessage,
-      sender: 'User'
+      sender: 'User',
+      timestamp: new Date()
     };
 
     this.messages.push(userMessage);
@@ -83,7 +106,8 @@ export class ChatBotComponent implements OnInit {
       next: (response) => {
         const botMessage: ChatMessage = {
           message: response.bot,
-          sender: 'Bot'
+          sender: 'Bot',
+          timestamp: new Date()
         };
         this.messages.push(botMessage);
         this.isLoading = false;
@@ -91,9 +115,29 @@ export class ChatBotComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error sending message:', error);
+        console.error('Error details:', {
+          status: error.status,
+          statusText: error.statusText,
+          message: error.message,
+          error: error.error
+        });
+        
+        let errorMessage = 'Sorry, I encountered an error. Please try again later.';
+        
+        if (error.status === 400) {
+          errorMessage = 'Invalid request. Please try again.';
+        } else if (error.status === 401) {
+          errorMessage = 'Please log in to continue the conversation.';
+        } else if (error.status === 500) {
+          errorMessage = 'Server error. Please try again in a moment.';
+        } else if (error.status === 0) {
+          errorMessage = 'Unable to connect to the server. Please check your internet connection.';
+        }
+        
         this.messages.push({
-          message: 'Sorry, I encountered an error. Please try again later.',
-          sender: 'Bot'
+          message: errorMessage,
+          sender: 'Bot',
+          timestamp: new Date()
         });
         this.isLoading = false;
         this.scrollToBottom();
