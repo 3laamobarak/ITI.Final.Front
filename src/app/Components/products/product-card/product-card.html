@@ -1,7 +1,7 @@
 
 <div class="product-card" [routerLink]="['/product', product.id]" style="cursor: pointer;">
   <div class="product-image">
-    <img [src]="product.imageUrl" [alt]="product.name">
+    <img [src]="product.imagepath" [alt]="product.name">
  <button class="add-to-cart-btn" (click)="addToCart(); $event.stopPropagation()">
       Add to Cart
     </button>

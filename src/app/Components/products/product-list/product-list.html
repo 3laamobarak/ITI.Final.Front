@@ -65,7 +65,7 @@
                   *ngFor="let suggestion of searchSuggestions"
                   (click)="onSearchSuggestionClick(suggestion)"
                 >
-                  <img *ngIf="suggestion.imageUrl" [src]="suggestion.imageUrl" [alt]="suggestion.name" class="suggestion-image">
+                  <img *ngIf="suggestion.imagepath" [src]="suggestion.imagepath" [alt]="suggestion.name" class="suggestion-image">
                   <span class="suggestion-name">{{ suggestion.name }}</span>
                 </div>
               </div>

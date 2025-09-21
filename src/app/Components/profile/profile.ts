@@ -540,7 +540,7 @@ export class Profile implements OnInit {
           products.forEach(product => {
             if (product) {
               this.productCache.set(product.id, product);
-              console.log(`Cached product ${product.id}:`, product.name, 'Image:', product.imageUrl);
+              console.log(`Cached product ${product.id}:`, product.name, 'Image:', product.imagepath);
             }
           });
           console.log('Product cache updated. Total cached products:', this.productCache.size);
@@ -570,9 +570,9 @@ export class Profile implements OnInit {
     console.log(`Getting image for product ${productId}:`, product);
     if (product) {
       // Try different image properties in order of preference
-      const imageUrl = product.imageUrl || product.imageone || 'assets/default-product.svg';
-      console.log(`Product ${productId} image URL:`, imageUrl);
-      return imageUrl;
+      const imagepath = product.imagepath || product.imageone || 'assets/default-product.svg';
+      console.log(`Product ${productId} image URL:`, imagepath);
+      return imagepath;
     }
     console.log(`Product ${productId} not found in cache, using default image`);
     return 'assets/default-product.svg';
@@ -605,7 +605,7 @@ export class Profile implements OnInit {
       name: 'TEST PRODUCT',
       price: 99.99,
       description: 'Test product for debugging',
-      imageUrl: 'https://via.placeholder.com/200x200/FF0000/FFFFFF?text=TEST',
+      imagepath: 'https://via.placeholder.com/200x200/FF0000/FFFFFF?text=TEST',
       brandId: 999,
       CreatedAt: new Date(),
       QuantitySold: 1
@@ -624,7 +624,7 @@ export class Profile implements OnInit {
         name: 'COLLAGEN COCONUT CREAMER',
         price: 19.99,
         description: 'Premium collagen creamer for daily wellness',
-        imageUrl: 'https://via.placeholder.com/200x200/4CAF50/FFFFFF?text=COLLAGEN',
+        imagepath: 'https://via.placeholder.com/200x200/4CAF50/FFFFFF?text=COLLAGEN',
         brandId: 1,
         CreatedAt: new Date(),
         QuantitySold: 150
@@ -634,7 +634,7 @@ export class Profile implements OnInit {
         name: 'CALIFORNIA GOLD NUTRITION CollagenUP',
         price: 24.99,
         description: 'Advanced collagen formula with hyaluronic acid and vitamin C',
-        imageUrl: 'https://via.placeholder.com/200x200/2196F3/FFFFFF?text=CollagenUP',
+        imagepath: 'https://via.placeholder.com/200x200/2196F3/FFFFFF?text=CollagenUP',
         brandId: 2,
         CreatedAt: new Date(),
         QuantitySold: 200
@@ -644,7 +644,7 @@ export class Profile implements OnInit {
         name: 'Vitamin D3 Supplement',
         price: 15.99,
         description: 'Essential vitamin D3 for bone and immune health',
-        imageUrl: 'https://via.placeholder.com/200x200/FF9800/FFFFFF?text=Vitamin+D3',
+        imagepath: 'https://via.placeholder.com/200x200/FF9800/FFFFFF?text=Vitamin+D3',
         brandId: 3,
         CreatedAt: new Date(),
         QuantitySold: 300
@@ -654,7 +654,7 @@ export class Profile implements OnInit {
         name: 'Omega-3 Fish Oil',
         price: 22.99,
         description: 'High-quality fish oil for heart and brain health',
-        imageUrl: 'https://via.placeholder.com/200x200/9C27B0/FFFFFF?text=Omega-3',
+        imagepath: 'https://via.placeholder.com/200x200/9C27B0/FFFFFF?text=Omega-3',
         brandId: 4,
         CreatedAt: new Date(),
         QuantitySold: 180
@@ -664,7 +664,7 @@ export class Profile implements OnInit {
         name: 'Probiotics Complex',
         price: 29.99,
         description: 'Multi-strain probiotic for digestive wellness',
-        imageUrl: 'https://via.placeholder.com/200x200/E91E63/FFFFFF?text=Probiotics',
+        imagepath: 'https://via.placeholder.com/200x200/E91E63/FFFFFF?text=Probiotics',
         brandId: 5,
         CreatedAt: new Date(),
         QuantitySold: 120
@@ -674,7 +674,7 @@ export class Profile implements OnInit {
         name: 'Multivitamin for Women',
         price: 18.99,
         description: 'Complete multivitamin formulated for women',
-        imageUrl: 'https://via.placeholder.com/200x200/00BCD4/FFFFFF?text=Multivitamin',
+        imagepath: 'https://via.placeholder.com/200x200/00BCD4/FFFFFF?text=Multivitamin',
         brandId: 6,
         CreatedAt: new Date(),
         QuantitySold: 250
@@ -684,7 +684,7 @@ export class Profile implements OnInit {
         name: 'Magnesium Glycinate',
         price: 16.99,
         description: 'High-absorption magnesium for better sleep and muscle recovery',
-        imageUrl: 'https://via.placeholder.com/200x200/795548/FFFFFF?text=Magnesium',
+        imagepath: 'https://via.placeholder.com/200x200/795548/FFFFFF?text=Magnesium',
         brandId: 7,
         CreatedAt: new Date(),
         QuantitySold: 175
@@ -694,7 +694,7 @@ export class Profile implements OnInit {
     // Add mock products to cache
     mockProducts.forEach(product => {
       this.productCache.set(product.id, product);
-      console.log(`Mock product ${product.id} added to cache:`, product.name, 'Image:', product.imageUrl);
+      console.log(`Mock product ${product.id} added to cache:`, product.name, 'Image:', product.imagepath);
     });
     
     console.log('Mock products added to cache. Total products:', this.productCache.size);
@@ -717,7 +717,7 @@ export class Profile implements OnInit {
             id: 1,
             name: 'COLLAGEN COCONUT CREAMER',
             price: 19.99,
-            imageUrl: 'https://via.placeholder.com/200x200?text=COLLAGEN+CREAMER',
+            imagepath: 'https://via.placeholder.com/200x200?text=COLLAGEN+CREAMER',
             description: 'Premium collagen creamer for daily wellness',
             CreatedAt: new Date(),
             QuantitySold: 150,
@@ -727,7 +727,7 @@ export class Profile implements OnInit {
             id: 2,
             name: 'CALIFORNIA GOLD NUTRITION CollagenUP Hydrolyzed Marine Collagen + Hyaluronic Acid + Vitamin C',
             price: 24.99,
-            imageUrl: 'https://via.placeholder.com/200x200?text=CollagenUP',
+            imagepath: 'https://via.placeholder.com/200x200?text=CollagenUP',
             description: 'Advanced collagen formula with hyaluronic acid and vitamin C',
             CreatedAt: new Date(),
             QuantitySold: 200,
@@ -737,7 +737,7 @@ export class Profile implements OnInit {
             id: 3,
             name: 'Vitamin D3 Supplement',
             price: 15.99,
-            imageUrl: 'https://via.placeholder.com/200x200?text=Vitamin+D3',
+            imagepath: 'https://via.placeholder.com/200x200?text=Vitamin+D3',
             description: 'Essential vitamin D3 for bone and immune health',
             CreatedAt: new Date(),
             QuantitySold: 300,
@@ -747,7 +747,7 @@ export class Profile implements OnInit {
             id: 4,
             name: 'Omega-3 Fish Oil',
             price: 22.99,
-            imageUrl: 'https://via.placeholder.com/200x200?text=Omega-3',
+            imagepath: 'https://via.placeholder.com/200x200?text=Omega-3',
             description: 'High-quality fish oil for heart and brain health',
             CreatedAt: new Date(),
             QuantitySold: 180,
@@ -757,7 +757,7 @@ export class Profile implements OnInit {
             id: 5,
             name: 'Probiotics Complex',
             price: 29.99,
-            imageUrl: 'https://via.placeholder.com/200x200?text=Probiotics',
+            imagepath: 'https://via.placeholder.com/200x200?text=Probiotics',
             description: 'Multi-strain probiotic for digestive wellness',
             CreatedAt: new Date(),
             QuantitySold: 120,
@@ -767,7 +767,7 @@ export class Profile implements OnInit {
             id: 6,
             name: 'Multivitamin for Women',
             price: 18.99,
-            imageUrl: 'https://via.placeholder.com/200x200?text=Multivitamin',
+            imagepath: 'https://via.placeholder.com/200x200?text=Multivitamin',
             description: 'Complete multivitamin formulated for women',
             CreatedAt: new Date(),
             QuantitySold: 250,

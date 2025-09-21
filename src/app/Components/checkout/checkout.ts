@@ -89,6 +89,23 @@ clientSecret: string = '';
   }
 
 async onSubmit() {
+  // Validate form data
+  if (!this.shippingAddress.fullName || !this.shippingAddress.address || 
+      !this.shippingAddress.city || !this.shippingAddress.zip) {
+    alert('Please fill in all shipping address fields.');
+    return;
+  }
+
+  if (this.cartItems.length === 0) {
+    alert('Your cart is empty.');
+    return;
+  }
+
+  if (this.total <= 0) {
+    alert('Invalid total amount.');
+    return;
+  }
+
   this.loading = true;
 
   const shippingAddressString = `${this.shippingAddress.fullName}, ${this.shippingAddress.address}, ${this.shippingAddress.city}, ${this.shippingAddress.zip}`;
@@ -96,7 +113,7 @@ async onSubmit() {
   const dto = {
     orderId: 0, // لو Order هيتم إنشاؤه في الباكند
     currency: 'usd',
-    amount: this.total + 4,
+    amount: this.total, // Backend will add shipping cost
     shippingAddress: shippingAddressString,
     cartItems: this.cartItems.map(i => ({
       cartItemId: i.cartItemId || 0,
@@ -108,8 +125,12 @@ async onSubmit() {
     }))
   };
 
+  console.log('Sending payment data:', dto);
+
   try {
     const res: any = await this.paymentService.createPayment(dto).toPromise();
+    console.log('Payment response:', res);
+    
     this.clientSecret = res.clientSecret;
 
     if (!this.clientSecret) {
@@ -120,7 +141,15 @@ async onSubmit() {
 
   } catch (err: any) {
     console.error('Payment creation error:', err);
-    alert(err?.message || 'Payment failed.');
+    let errorMessage = 'Payment failed.';
+    
+    if (err?.error?.message) {
+      errorMessage = err.error.message;
+    } else if (err?.message) {
+      errorMessage = err.message;
+    }
+    
+    alert(errorMessage);
     this.loading = false;
   }
 }
@@ -134,36 +163,77 @@ async confirmCardPayment(clientSecret: string) {
     return;
   }
 
-  const result = await this.stripe.confirmCardPayment(clientSecret, {
-    payment_method: {
-      card: this.card,
-      billing_details: {
-        name: this.shippingAddress.fullName,
-        address: {
-          line1: this.shippingAddress.address,
-          city: this.shippingAddress.city,
-          postal_code: this.shippingAddress.zip,
+  console.log('Confirming payment with client secret:', clientSecret);
+
+  try {
+    const result = await this.stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: this.card,
+        billing_details: {
+          name: this.shippingAddress.fullName,
+          address: {
+            line1: this.shippingAddress.address,
+            city: this.shippingAddress.city,
+            postal_code: this.shippingAddress.zip,
+          },
         },
       },
-    },
-  });
-
-  if (result.error) {
-    alert(result.error.message);
-    this.loading = false;
-    this.cdr.detectChanges();
-  } else if (result.paymentIntent?.status === 'succeeded') {
-    this.loading = false;
-    this.cdr.detectChanges();
-
-    this.router.navigate(['/order-confirmation'], {
-      state: {
-        orderId: result.paymentIntent.id,      
-        amount: this.total + 4,                
-        shippingAddress: this.shippingAddress, 
-        cartItems: this.cartItems             
-      }
     });
+
+    console.log('Payment confirmation result:', result);
+
+    if (result.error) {
+      console.error('Payment failed:', result.error);
+      alert(`Payment failed: ${result.error.message}`);
+      this.loading = false;
+      this.cdr.detectChanges();
+    } else if (result.paymentIntent?.status === 'succeeded') {
+      console.log('Payment succeeded! Confirming with backend...');
+      
+      // Confirm payment with backend
+      try {
+        const confirmResult = await this.paymentService.confirmPayment(result.paymentIntent.id).toPromise();
+        console.log('Backend confirmation result:', confirmResult);
+        
+        if (confirmResult.success) {
+          console.log('Payment confirmed successfully in backend');
+          
+          // Clear cart after successful payment
+          this.cartService.clearCart().subscribe({
+            next: () => console.log('Cart cleared successfully'),
+            error: (err) => console.error('Error clearing cart:', err)
+          });
+
+          this.router.navigate(['/order-confirmation'], {
+            state: {
+              orderId: result.paymentIntent.id,      
+              amount: this.total + 4, // Display total with shipping for user
+              shippingAddress: this.shippingAddress, 
+              cartItems: this.cartItems             
+            }
+          });
+        } else {
+          console.error('Backend payment confirmation failed');
+          alert('Payment confirmation failed. Please contact support.');
+        }
+      } catch (confirmError) {
+        console.error('Error confirming payment with backend:', confirmError);
+        alert('Payment confirmation failed. Please contact support.');
+      }
+      
+      this.loading = false;
+      this.cdr.detectChanges();
+    } else {
+      console.log('Payment status:', result.paymentIntent?.status);
+      alert(`Payment status: ${result.paymentIntent?.status}`);
+      this.loading = false;
+      this.cdr.detectChanges();
+    }
+  } catch (error) {
+    console.error('Error during payment confirmation:', error);
+    alert('An error occurred during payment confirmation.');
+    this.loading = false;
+    this.cdr.detectChanges();
   }
 }
   onPaymentMethodChange() {

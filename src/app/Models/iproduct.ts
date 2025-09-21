@@ -9,7 +9,7 @@ export interface IProduct {
   
 
   // image
-  imageUrl?: string;
+  imagepath?: string;
   imageone?: string;
   imagetwo?: string;
   imagethree?: string;
