@@ -55,7 +55,7 @@ export class ProductDetails implements OnInit {
           this.galleryImages = [
            
             'https://cloudinary.images-iherb.com/image/upload/f_auto,q_auto:eco/images/now/now00035/g/32.jpg',
-              ...(data.imageUrl ? [data.imageUrl] : []), 
+              ...(data.imagepath ? [data.imagepath] : []), 
             'https://cloudinary.images-iherb.com/image/upload/f_auto,q_auto:eco/images/now/now00035/s/43.jpg',
             'https://cloudinary.images-iherb.com/image/upload/w_75/f_auto,q_auto:eco/images/cms/banners/dPDP_Authenticity_Graphic2_2025_009en-us.jpg',
             'https://cloudinary.images-iherb.com/image/upload/f_auto,q_auto:eco/images/now/now00035/s/38.jpg',

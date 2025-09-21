@@ -193,7 +193,7 @@
               <div class="cart-items">
                 <div *ngFor="let item of cartItems" class="cart-item">
                   <div class="item-image">
-                    <img [src]="item.imageUrl || 'assets/default-product.svg'" 
+                    <img [src]="item.imagepath || 'assets/default-product.svg'" 
                          [alt]="item.productName"
                          (error)="onImageError($event)">
                   </div>
@@ -352,7 +352,7 @@
                 <div class="products-list" #productList>
                   <div *ngFor="let product of recommendedProducts" class="product-item" (click)="viewProduct(product.id)">
                     <div class="product-image">
-                      <img [src]="product.imageUrl || 'assets/default-product.svg'" 
+                      <img [src]="product.imagepath || 'assets/default-product.svg'" 
                            [alt]="product.name"
                            (error)="onImageError($event)">
                     </div>

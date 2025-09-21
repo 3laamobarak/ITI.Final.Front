@@ -21,7 +21,7 @@ export interface IOrder {
 export interface IOrderItem {
   productId: number;
   quantity: number;
-  // Note: Backend OrderItemDto doesn't have productName, price, or imageUrl
+  // Note: Backend OrderItemDto doesn't have productName, price, or imagepath
   // These might need to be populated from product data
 }
 
@@ -49,6 +49,6 @@ export interface IWishlistItem {
   productId: number;
   productName: string;
   price: number;
-  imageUrl?: string;
+  imagepath?: string;
   isAvailable: boolean;
 }

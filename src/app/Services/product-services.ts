@@ -26,7 +26,7 @@ export class ProductServices {
         stockQuantity: p.StockQuantity || p.stockQuantity,
         averageRating: p.AverageRating || p.averageRating,
         reviews: p.ReviewCount || p.reviewCount,
-        imageUrl: p.imageUrl,
+        imagepath: p.imagepath,
         brandId: p.brandId || 0, // This will need to be mapped from brandName
         brandName: p.BrandName || p.brandName, // Store brand name for mapping
         ProductCategories: p.CategoryName ? [p.CategoryName] : (p.categoryName ? [p.categoryName] : []),
@@ -48,7 +48,7 @@ export class ProductServices {
         stockQuantity: product.stockQuantity || product.StockQuantity,
         averageRating: product.averageRating || product.AverageRating || 0,
         reviews: product.reviewCount || product.ReviewCount || 0,
-        imageUrl: product.imageUrl,
+        imagepath: product.imagepath,
         brandId: product.brandId || product.BrandId || 0,
         brandName: product.brandName || product.BrandName,
         ProductCategories: product.productCategories || product.ProductCategories || [],
@@ -77,7 +77,7 @@ export class ProductServices {
         stockQuantity: product.stockQuantity || product.StockQuantity,
         averageRating: product.averageRating || product.AverageRating || 0,
         reviews: product.reviewCount || product.ReviewCount || 0,
-        imageUrl: product.imageUrl,
+        imagepath: product.imagepath,
         brandId: product.brandId || product.BrandId || 0,
         brandName: product.brandName || product.BrandName,
         ProductCategories: product.productCategories || product.ProductCategories || [],
@@ -110,7 +110,7 @@ export class ProductServices {
           .map((p) => ({
             id: p.id,
             name: p.name,
-            imageUrl: (p as any).imageUrl || '',
+            imagepath: (p as any).imagepath || '',
           }))
       )
     );
