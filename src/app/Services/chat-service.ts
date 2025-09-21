@@ -23,6 +23,7 @@ export class ChatService {
       return;
     }
 
+    console.log('Attempting to connect to SignalR hub at:', environment.apiUrl + '/chathub');
     this.hubConnection = new HubConnectionBuilder()
       .withUrl(`${environment.apiUrl}/chathub`, {
         accessTokenFactory: () => token
@@ -40,7 +41,7 @@ export class ChatService {
       console.log('SignalR connected to', environment.apiUrl + '/chathub');
     } catch (err) {
       console.error('SignalR connection error:', err);
-      throw err; // Propagate for caller to handle
+      throw err;
     }
   }
 

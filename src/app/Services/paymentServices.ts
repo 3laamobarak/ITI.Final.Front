@@ -17,6 +17,9 @@ export class PaymentService {
     }
     return new HttpHeaders({ 'Authorization': `Bearer ${token}` });
   }
+  all(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/all`, { headers: this.getAuthHeaders() });
+  }
 
   createPayment(paymentData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/create`, paymentData, { headers: this.getAuthHeaders() });

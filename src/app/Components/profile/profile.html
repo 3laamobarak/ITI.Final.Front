@@ -2,378 +2,6 @@
   <!-- Breadcrumbs -->
  
   <!-- Main Content -->
-  <div class="main-content">
-      <!-- Loading Spinner -->
-      <div *ngIf="isLoading" class="text-center py-5">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        <p class="mt-3">Loading your profile...</p>
-        <button class="btn btn-outline-primary btn-sm" (click)="debugInfo()">Debug Info</button>
-      </div>
-
-      <!-- Profile Header -->
-      <div *ngIf="!isLoading" class="profile-header">
-        <div class="row align-items-center">
-          <div class="col-md-8">
-            <div class="d-flex align-items-center">
-              <div class="profile-avatar me-3">
-                <div class="avatar-circle">
-                  {{ getInitials() }}
-                </div>
-                <button class="edit-avatar-btn">
-                  <i class="bi bi-pencil"></i>
-                </button>
-              </div>
-              <div class="profile-info">
-                <h4 class="profile-name">Hey, {{ getUserDisplayName() }}</h4>
-                <p class="profile-email">{{ getUserEmail() }}</p>
-                <p class="customer-since" *ngIf="userProfile?.customerSince">
-                  <!-- Customer since {{ formatDate(userProfile.customerSince) }} -->
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-          </div>
-        </div>
-      </div>
-
-      <!-- Dashboard Content -->
-      <div *ngIf="!isLoading && isDashboardRoute()" class="dashboard-content">
-        <!-- Quick Stats -->
-        <div class="quick-stats">
-          <div class="row">
-            <div class="col-md-3 col-sm-6 mb-3">
-              <div class="stat-card">
-                <div class="stat-icon text-primary">
-                  <i class="bi bi-bag"></i>
-                </div>
-                <div class="stat-content">
-                  <h6 class="stat-number">{{ userOrders.length }}</h6>
-                  <p class="stat-label">Total Orders</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-3">
-              <div class="stat-card">
-                <div class="stat-icon text-success">
-                  <i class="bi bi-cart"></i>
-                </div>
-                <div class="stat-content">
-                  <h6 class="stat-number">{{ cartItems.length }}</h6>
-                  <p class="stat-label">Cart Items</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-3">
-              <div class="stat-card">
-                <div class="stat-icon text-warning">
-                  <i class="bi bi-star"></i>
-                </div>
-                <div class="stat-content">
-                  <h6 class="stat-number">{{ userReviews.length }}</h6>
-                  <p class="stat-label">Reviews Written</p>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-3">
-              <div class="stat-card">
-                <div class="stat-icon text-info">
-                  <i class="bi bi-arrow-clockwise"></i>
-                </div>
-                <div class="stat-content">
-                  <h6 class="stat-number">{{ userRefunds.length }}</h6>
-                  <p class="stat-label">Refund Requests</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Main Content Sections -->
-        <div class="main-sections">
-          <!-- Orders Section -->
-          <div id="orders" class="content-section orders-section">
-            <div class="section-header">
-              <h4 class="section-title">
-                <i class="bi bi-bag"></i>
-                My Orders
-              </h4>
-              <p class="section-subtitle">Track your order history and manage your purchases</p>
-            </div>
-
-            <div *ngIf="userOrders.length === 0" class="empty-state">
-              <div class="empty-icon">
-                <i class="bi bi-bag"></i>
-              </div>
-              <h5>No Orders Yet</h5>
-              <p>You haven't placed any orders yet. Start shopping to see your orders here!</p>
-              <button class="btn btn-primary" routerLink="/products">Start Shopping</button>
-            </div>
-
-       
-
-            <div *ngIf="userOrders.length > 0" class="orders-container">
-              <div class="orders-list">
-                <div *ngFor="let order of userOrders" class="order-card">
-                  <div class="order-header">
-                    <div class="order-info">
-                      <h6 class="order-id">Order #{{ order.id }}</h6>
-                      <p class="order-date">{{ formatDate(order.orderDate) }}</p>
-                    </div>
-                    <div class="order-status">
-                      <span class="status-badge" [class]="'status-' + order.status.toLowerCase()">
-                        {{ order.status }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="order-details">
-                    <div class="order-items">
-                      <div *ngFor="let item of order.orderItems" class="order-item">
-                     
-                        <div class="item-info">
-                          <h6 class="item-name">{{ getProductName(item.productId) }}</h6>
-                          <p class="item-quantity">Quantity: {{ item.quantity }}</p>
-                          <p class="item-price">Price: ${{ getProductPrice(item.productId).toFixed(2) }}</p>
-                          <small class="debug-info" *ngIf="!isProductLoaded(item.productId)">
-                            Product {{ item.productId }} not loaded yet
-                          </small>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="order-summary">
-                      <div class="summary-row">
-                        <span>Shipping Address:</span>
-                        <span>{{ order.shippingAddress || 'N/A' }}</span>
-                      </div>
-                      <div class="summary-row total">
-                        <span>Total:</span>
-                        <span>${{ order.total.toFixed(2) }}</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="order-actions">
-                   
-                    <button *ngIf="order.status === 'Pending' || order.status === 'Processing'" class="btn btn-outline-danger btn-sm" (click)="cancelOrder(order.id)">
-                      <i class="bi bi-x-circle"></i> Cancel Order
-                    </button>
-                    <button *ngIf="order.status === 'Delivered'" class="btn btn-outline-success btn-sm" (click)="reorderItems(order)">
-                      <i class="bi bi-arrow-repeat"></i> Reorder
-                    </button>
-                    <button *ngIf="order.status === 'Delivered'" class="btn btn-outline-warning btn-sm" (click)="requestRefund(order.id)">
-                      <i class="bi bi-arrow-clockwise"></i> Request Refund
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Cart Section -->
-          <div id="cart" class="content-section cart-section">
-            <div class="section-header">
-              <h4 class="section-title">
-                <i class="bi bi-cart"></i>
-                Shopping Cart
-              </h4>
-              <p class="section-subtitle">Review and manage your cart items</p>
-            </div>
-
-            <div *ngIf="cartItems.length === 0" class="empty-state">
-              <div class="empty-icon">
-                <i class="bi bi-cart"></i>
-              </div>
-              <h5>Your Cart is Empty</h5>
-              <p>Add some products to your cart to see them here!</p>
-              <button class="btn btn-primary" routerLink="/products">Continue Shopping</button>
-            </div>
-
-            <div *ngIf="cartItems.length > 0" class="cart-container">
-              <div class="cart-items">
-                <div *ngFor="let item of cartItems" class="cart-item">
-                  <div class="item-image">
-                    <img [src]="item.imagepath || 'assets/default-product.svg'" 
-                         [alt]="item.productName"
-                         (error)="onImageError($event)">
-                  </div>
-                  <div class="item-details">
-                    <h6 class="item-name">{{ item.productName }}</h6>
-                    <p class="item-price">${{ item.price.toFixed(2) }}</p>
-                    <div class="quantity-controls">
-                      <button class="btn btn-sm btn-outline-secondary" (click)="updateQuantity(item.cartItemId, item.quantity - 1)" [disabled]="item.quantity <= 1">
-                        <i class="bi bi-dash"></i>
-                      </button>
-                      <span class="quantity">{{ item.quantity }}</span>
-                      <button class="btn btn-sm btn-outline-secondary" (click)="updateQuantity(item.cartItemId, item.quantity + 1)">
-                        <i class="bi bi-plus"></i>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="item-total">
-                    <span class="total-price">${{ (item.price * item.quantity).toFixed(2) }}</span>
-                    <button class="btn btn-sm btn-outline-danger" (click)="removeFromCart(item.cartItemId)">
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div class="cart-summary">
-                <div class="summary-card">
-                  <h6>Order Summary</h6>
-                  <div class="summary-row">
-                    <span>Subtotal ({{ getTotalItems() }} items):</span>
-                    <span>${{ getCartSubtotal().toFixed(2) }}</span>
-                  </div>
-                  <div class="summary-row">
-                    <span>Shipping:</span>
-                    <span>${{ getShippingCost().toFixed(2) }}</span>
-                  </div>
-                  <div class="summary-row total">
-                    <span>Total:</span>
-                    <span>${{ getCartTotal().toFixed(2) }}</span>
-                  </div>
-                  <div class="cart-actions">
-                    <button class="btn btn-outline-secondary" (click)="clearCart()">
-                      <i class="bi bi-trash"></i> Clear Cart
-                    </button>
-                    <button class="btn btn-primary" (click)="proceedToCheckout()">
-                      <i class="bi bi-credit-card"></i> Checkout
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Profile Settings Section -->
-          <div id="profilesettings" class="content-section settings-section">
-            <div class="section-header">
-              <h4 class="section-title">
-                <i class="bi bi-gear"></i>
-                Profile Settings
-              </h4>
-              <p class="section-subtitle">Manage your account information and preferences</p>
-            </div>
-
-            <div class="settings-grid">
-              <div class="row">
-                <div class="col-md-6 mb-4">
-                  <div class="settings-card" (click)="startEditingProfile()">
-                    <div class="settings-icon">
-                      <i class="bi bi-person"></i>
-                    </div>
-                    <div class="settings-content">
-                      <h6 class="settings-card-title">Personal Information</h6>
-                      <p class="settings-card-description">Update your name, phone, age, and gender</p>
-                    </div>
-                    <i class="bi bi-chevron-right settings-arrow"></i>
-                  </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                  <div class="settings-card" (click)="startEditingPassword()">
-                    <div class="settings-icon">
-                      <i class="bi bi-key"></i>
-                    </div>
-                    <div class="settings-content">
-                      <h6 class="settings-card-title">Change Password</h6>
-                      <p class="settings-card-description">Update your account password for security</p>
-                    </div>
-                    <i class="bi bi-chevron-right settings-arrow"></i>
-                  </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                  <div class="settings-card" (click)="startEditingEmail()">
-                    <div class="settings-icon">
-                      <i class="bi bi-envelope"></i>
-                    </div>
-                    <div class="settings-content">
-                      <h6 class="settings-card-title">Email Address</h6>
-                      <p class="settings-card-description">Change your email address</p>
-                    </div>
-                    <i class="bi bi-chevron-right settings-arrow"></i>
-                  </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                  <div class="settings-card" routerLink="/profile/addresses">
-                    <div class="settings-icon">
-                      <i class="bi bi-geo-alt"></i>
-                    </div>
-                    <div class="settings-content">
-                      <h6 class="settings-card-title">Address Book</h6>
-                      <p class="settings-card-description">Manage your delivery addresses</p>
-                    </div>
-                    <i class="bi bi-chevron-right settings-arrow"></i>
-                  </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                  <div class="settings-card" routerLink="/profile/payment">
-                    <div class="settings-icon">
-                      <i class="bi bi-credit-card"></i>
-                    </div>
-                    <div class="settings-content">
-                      <h6 class="settings-card-title">Payment Methods</h6>
-                      <p class="settings-card-description">Manage your payment options</p>
-                    </div>
-                    <i class="bi bi-chevron-right settings-arrow"></i>
-                  </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                  <div class="settings-card" routerLink="/profile/notifications">
-                    <div class="settings-icon">
-                      <i class="bi bi-bell"></i>
-                    </div>
-                    <div class="settings-content">
-                      <h6 class="settings-card-title">Notifications</h6>
-                      <p class="settings-card-description">Manage your notification preferences</p>
-                    </div>
-                    <i class="bi bi-chevron-right settings-arrow"></i>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-          <!-- Recommended Products Section -->
-          <div *ngIf="recommendedProducts.length > 0" class="content-section recommended-section">
-            <div class="section-header">
-              <h4 class="section-title">
-                <i class="bi bi-star"></i>
-                Recommended for You
-              </h4>
-              <p class="section-subtitle">Products we think you'll love based on your preferences</p>
-            </div>
-            <div class="products-carousel">
-              <div class="carousel-container">
-                <button class="carousel-btn prev-btn" (click)="scrollCarousel('left')">
-                  <i class="bi bi-chevron-left"></i>
-                </button>
-                <div class="products-list" #productList>
-                  <div *ngFor="let product of recommendedProducts" class="product-item" (click)="viewProduct(product.id)">
-                    <div class="product-image">
-                      <img [src]="product.imagepath || 'assets/default-product.svg'" 
-                           [alt]="product.name"
-                           (error)="onImageError($event)">
-                    </div>
-                    <div class="product-info">
-                      <h6 class="product-name">{{ product.name }}</h6>
-                      <div class="product-price">${{ product.price.toFixed(2) }}</div>
-                      <button class="btn btn-sm btn-primary add-to-cart-btn" (click)="addToCart(product.id, $event)">
-                        <i class="bi bi-cart-plus"></i> Add to Cart
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <button class="carousel-btn next-btn" (click)="scrollCarousel('right')">
-                  <i class="bi bi-chevron-right"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        </div> <!-- Close main-sections -->
-      </div>
 
       <!-- Orders Page Content -->
       <div *ngIf="!isLoading && isOrdersRoute()" class="orders-page-content">
@@ -453,9 +81,7 @@
                 <button *ngIf="order.status === 'Delivered'" class="btn btn-outline-success btn-sm" (click)="reorderItems(order)">
                   <i class="bi bi-arrow-repeat"></i> Reorder
                 </button>
-                <button *ngIf="order.status === 'Delivered'" class="btn btn-outline-warning btn-sm" (click)="requestRefund(order.id)">
-                  <i class="bi bi-arrow-clockwise"></i> Request Refund
-                </button>
+       
               </div>
             </div>
           </div>
@@ -851,23 +477,192 @@
       </div>
 
       <!-- Payment Page Content -->
-      <div *ngIf="!isLoading && isPaymentRoute()" class="payment-page-content">
-        <div class="page-header">
-          <h2 class="page-title">
-            <i class="bi bi-credit-card"></i>
-            Payment Methods
-          </h2>
-          <p class="page-subtitle">Manage your payment options</p>
-        </div>
-        <div class="empty-state">
-          <div class="empty-icon">
-            <i class="bi bi-credit-card"></i>
+<div *ngIf="!isLoading && isPaymentRoute()" class="payment-page-content">
+  <div class="page-header">
+    <h2 class="page-title">
+      <i class="bi bi-credit-card"></i>
+      Payment Methods
+    </h2>
+    <p class="page-subtitle">Manage your payment options</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="payments.length === 0" class="empty-state">
+    <div class="empty-icon">
+      <i class="bi bi-credit-card"></i>
+    </div>
+    <h5>No Payment Methods</h5>
+    <p>You haven't added any payment methods yet.</p>
+    <button class="btn btn-primary">Add Payment Method</button>
+  </div>
+
+  <!-- Payments List -->
+  <div *ngIf="payments.length > 0" class="payment-methods-container">
+    <div class="payment-methods-list">
+      <div *ngFor="let payment of payments" class="payment-card">
+        
+        <!-- Header -->
+        <div class="payment-header">
+          <div class="payment-info">
+            <h6 class="payment-id">Payment #{{ payment.id }}</h6>
+            <p class="payment-date">{{ payment.paymentDate | date:'mediumDate' }}</p>
           </div>
-          <h5>Payment Methods</h5>
-          <p>Manage your payment methods here.</p>
-          <button class="btn btn-primary">Add Payment Method</button>
+          <div class="payment-status">
+            <span class="status-badge" 
+                  [ngClass]="payment.isSuccessful ? 'status-success' : 'status-failed'">
+              {{ payment.isSuccessful ? 'Successful' : 'Failed' }}
+            </span>
+          </div>
         </div>
+
+        <!-- Details -->
+        <div class="payment-details">
+          <p class="payment-amount">Amount: {{ payment.amount | currency:'USD' }}</p>
+          <p class="payment-method">Method: {{ payment.paymentMethod }}</p>
+          <p *ngIf="payment.shippingAddress" class="shipping-address">
+            Shipping Address: {{ payment.shippingAddress }}
+          </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="payment-actions">
+          <button *ngIf="payment.isSuccessful && !payment.refundedAmount" 
+                  class="btn btn-outline-warning btn-sm" 
+                  (click)="requestRefund(payment)"
+                  [disabled]="isLoading">
+            <i class="bi bi-arrow-clockwise"></i> Request Refund
+          </button>
+
+          <button *ngIf="payment.refundedAmount" 
+                  class="btn btn-outline-info btn-sm" disabled>
+            <i class="bi bi-check-circle"></i> Refunded: {{ payment.refundedAmount | currency:'USD' }}
+          </button>
+        </div>
+
       </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .payment-page-content {
+    padding: 20px;
+    background-color: #f8f9fa;
+  }
+
+  .page-header {
+    margin-bottom: 20px;
+  }
+
+  .page-title {
+    font-size: 24px;
+    color: #333;
+    display: flex;
+    align-items: center;
+  }
+
+  .page-title i {
+    margin-right: 10px;
+  }
+
+  .payment-methods-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .payment-methods-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* مسافة بين كل بطاقة دفعة */
+  }
+
+  .payment-card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .payment-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .payment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .payment-info h6 {
+    margin: 0;
+    font-size: 16px;
+    color: #2c3e50;
+  }
+
+  .payment-info p {
+    margin: 5px 0 0;
+    color: #7f8c8d;
+    font-size: 14px;
+  }
+
+  .payment-status .status-badge {
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .payment-status .status-success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+
+  .payment-status .status-failed {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+
+  .payment-details p {
+    margin: 5px 0;
+    color: #34495e;
+    font-size: 14px;
+  }
+
+  .payment-actions {
+    margin-top: 10px;
+    text-align: right;
+  }
+
+  .payment-actions button {
+    margin-left: 10px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+  }
+
+  .empty-state .empty-icon i {
+    font-size: 40px;
+    color: #6c757d;
+  }
+
+  .empty-state h5 {
+    margin: 10px 0;
+    color: #333;
+  }
+
+  .empty-state p {
+    color: #7f8c8d;
+    margin-bottom: 20px;
+  }
+</style>
 
       <!-- Lists Page Content -->
       <div *ngIf="!isLoading && isListsRoute()" class="lists-page-content">

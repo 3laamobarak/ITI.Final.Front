@@ -10,6 +10,9 @@ import { CartServices } from '../../Services/cart-services';
 import { Refund } from '../../Services/refund.service';
 import { IUserProfile, IOrder, IReward, IMessage } from '../../Models/IUserProfile';
 import { IProduct } from '../../Models/iproduct';
+import { IPayment } from '../../Models/IPayment';
+import { PaymentService } from '../../Services/paymentServices';
+import {RefundService, CreateRefundRequest } from '../../Services/refund.service';
 
 @Component({
   selector: 'app-profile',
@@ -18,7 +21,10 @@ import { IProduct } from '../../Models/iproduct';
   styleUrl: './profile.css'
 })
 export class Profile implements OnInit {
+
+  
   @ViewChild('productList', { static: false }) productList!: ElementRef;
+
   
   userProfile: IUserProfile | null = null;
   userOrders: IOrder[] = [];
@@ -38,7 +44,7 @@ export class Profile implements OnInit {
   userChatMessages: any[] = [];
   otpStatus: any = null;
   cartItems: any[] = [];
-  
+
   // Product cache for order items
   productCache: Map<number, IProduct> = new Map();
 
@@ -173,23 +179,36 @@ export class Profile implements OnInit {
       color: 'primary'
     }
   ];
-
+  private userId: string = '';
+   payments: any[] = [];
   constructor(
     private profileService: ProfileService,
     private productService: ProductServices,
     private cartService: CartServices,
     private router: Router,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private paymentService: PaymentService,
+    private refundService: RefundService
   ) {
     this.initializeForms();
   }
 
   ngOnInit(): void {
-    this.loadUserData();
-    this.loadRecommendedProducts();
-    this.loadCartData();
-    
+  this.profileService.getUserProfile().subscribe(profile => {
+    this.userId = profile.id;
+
+    // استنى لما يجي ال userId وبعدين هات ال payments
+    this.paymentService.all().subscribe(payments => {
+      this.payments = payments.filter((p: IPayment) => p.userId === this.userId);
+      console.log('Current userId:', this.userId);
+      console.log('User payments:', this.payments);
+    });
+  });
+
+  this.loadUserData();
+  this.loadRecommendedProducts();
+  this.loadCartData();
     // Debug: Check if data is loading properly
     setTimeout(() => {
       console.log('Data check after 2 seconds:', {
@@ -198,7 +217,7 @@ export class Profile implements OnInit {
         profile: this.userProfile ? 'loaded' : 'not loaded'
       });
     }, 2000);
-    
+
     // Set a timeout to ensure loading state is cleared even if API calls fail
     setTimeout(() => {
       if (this.isLoading) {
@@ -243,7 +262,7 @@ export class Profile implements OnInit {
   passwordMatchValidator(form: FormGroup) {
     const newPassword = form.get('newPassword');
     const confirmPassword = form.get('confirmPassword');
-    
+
     if (newPassword && confirmPassword && newPassword.value !== confirmPassword.value) {
       confirmPassword.setErrors({ passwordMismatch: true });
     } else {
@@ -259,7 +278,7 @@ export class Profile implements OnInit {
 
   loadUserData(): void {
     this.isLoading = true;
-    
+
     // Use forkJoin to wait for all API calls to complete
     const apiCalls = [
       this.profileService.getUserProfile().pipe(
@@ -326,7 +345,7 @@ export class Profile implements OnInit {
 
     forkJoin(apiCalls).subscribe({
       next: ([profile, orders, rewards, messages, refunds, reviews, categories, brands, chatMessages, otpStatus]) => {
-        
+
         // Debug logging
         console.log('Profile data loaded:', {
           profile,
@@ -337,10 +356,10 @@ export class Profile implements OnInit {
           refunds,
           reviews
         });
-        
+
         this.userProfile = profile;
         this.userOrders = orders || [];
-        
+
         // Add mock data for testing if no orders are returned
         if (!orders || orders.length === 0) {
           console.log('No orders returned from API, adding mock data for testing');
@@ -399,21 +418,21 @@ export class Profile implements OnInit {
               ]
             }
           ];
-          
+
           // Add mock product data to cache for testing
           this.addMockProductsToCache();
         }
-        
+
         // Load product details for order items (after setting up orders)
         this.loadProductDetailsForOrders();
-        
+
         this.userRewards = rewards;
         this.userMessages = messages || [];
         this.userRefunds = (refunds || []).map((refund: any) => ({
           ...refund,
           status: refund.isProcessed ? 'Processed' : 'Pending'
         }));
-        
+
         // Add mock refunds for testing if no refunds are returned
         if (!refunds || refunds.length === 0) {
           console.log('No refunds returned from API, adding mock data for testing');
@@ -441,7 +460,7 @@ export class Profile implements OnInit {
           ];
         }
         this.userReviews = reviews || [];
-        
+
         // Add mock reviews for testing if no reviews are returned
         if (!reviews || reviews.length === 0) {
           console.log('No reviews returned from API, adding mock data for testing');
@@ -484,16 +503,16 @@ export class Profile implements OnInit {
             }
           ];
         }
-        
+
         this.userCategories = categories || [];
         this.userBrands = brands || [];
         this.userChatMessages = chatMessages || [];
         this.otpStatus = otpStatus;
-        
+
         // Update unread messages count
         this.unreadMessagesCount = (messages || []).filter((m: any) => !m.isRead).length;
         this.updateMessagesBadge();
-        
+
         this.isLoading = false;
       },
       error: (error) => {
@@ -525,7 +544,7 @@ export class Profile implements OnInit {
 
     // Fetch product details for all unique product IDs
     if (productIds.size > 0) {
-      const productRequests = Array.from(productIds).map(productId => 
+      const productRequests = Array.from(productIds).map(productId =>
         this.productService.getProductById(productId).pipe(
           catchError(error => {
             console.error(`Error loading product ${productId}:`, error);
@@ -598,7 +617,7 @@ export class Profile implements OnInit {
     console.log('Testing product cache...');
     console.log('Current cache size:', this.productCache.size);
     console.log('Current cache contents:', Array.from(this.productCache.entries()));
-    
+
     // Force add a test product
     const testProduct: IProduct = {
       id: 999,
@@ -610,7 +629,7 @@ export class Profile implements OnInit {
       CreatedAt: new Date(),
       QuantitySold: 1
     };
-    
+
     this.productCache.set(999, testProduct);
     console.log('Test product added to cache');
     this.cdr.detectChanges();
@@ -696,9 +715,9 @@ export class Profile implements OnInit {
       this.productCache.set(product.id, product);
       console.log(`Mock product ${product.id} added to cache:`, product.name, 'Image:', product.imagepath);
     });
-    
+
     console.log('Mock products added to cache. Total products:', this.productCache.size);
-    
+
     // Trigger change detection to update the template
     this.cdr.detectChanges();
   }
@@ -780,7 +799,7 @@ export class Profile implements OnInit {
 
   updateMessagesBadge(): void {
     const messagesItem = this.navigationItems[0].items.find(item => item.name === 'Messages');
- 
+
   }
 
   shuffleArray<T>(array: T[]): T[] {
@@ -820,15 +839,15 @@ export class Profile implements OnInit {
       const scrollAmount = 220; // Width of one product card + gap
       const currentScroll = this.productList.nativeElement.scrollLeft;
       let newScroll: number;
-      
+
       if (typeof direction === 'number') {
         newScroll = currentScroll + (direction * scrollAmount);
       } else {
-        newScroll = direction === 'left' 
-          ? currentScroll - scrollAmount 
+        newScroll = direction === 'left'
+          ? currentScroll - scrollAmount
           : currentScroll + scrollAmount;
       }
-      
+
       this.productList.nativeElement.scrollTo({
         left: newScroll,
         behavior: 'smooth'
@@ -950,7 +969,7 @@ export class Profile implements OnInit {
         firstName: this.profileForm.value.firstName,
         phoneNumber: this.profileForm.value.phoneNumber
       };
-      
+
       this.profileService.updateProfile(profileData).subscribe({
         next: (response) => {
           this.showMessage('Profile updated successfully!', 'success');
@@ -1073,7 +1092,7 @@ export class Profile implements OnInit {
 
   updateQuantity(itemId: number, newQuantity: number): void {
     if (newQuantity < 1) return;
-    
+
     this.cartService.updateQuantity(itemId, newQuantity).subscribe({
       next: () => {
         this.loadCartData(); // Reload cart data
@@ -1159,17 +1178,29 @@ export class Profile implements OnInit {
     });
   }
 
-  requestRefund(orderId: number): void {
-    const order = this.userOrders.find(o => o.id === orderId);
-    if (order) {
-      this.selectedOrderForRefund = order;
-      this.refundForm.patchValue({
-        amount: order.total
-      });
-      this.isCreatingRefund = true;
-      this.clearMessages();
+requestRefund(payment: IPayment): void {
+  this.isLoading = true;
+console.log('Requesting refund for payment:', payment);
+const refundData: CreateRefundRequest = {
+  reason: 'User requested refund',
+  amount: payment.amount,
+  orderId: payment.orderId,
+  paymentId: payment.id // لو موجود في الموديل
+};
+
+  this.refundService.createRefund(refundData).subscribe({
+    next: (refund: Refund) => {
+      console.log('Refund requested successfully:', refund);
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    },
+    error: (error) => {
+      console.error('Error requesting refund:', error);
+      this.isLoading = false;
     }
-  }
+  });
+}
+
 
   cancelOrder(orderId: number): void {
     if (confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
@@ -1270,7 +1301,7 @@ export class Profile implements OnInit {
       productCache: this.productCache,
       productCacheSize: this.productCache.size
     });
-    
+
     // Log all order items and their product IDs
     this.userOrders.forEach(order => {
       console.log(`Order ${order.id} items:`, order.orderItems);
@@ -1279,7 +1310,7 @@ export class Profile implements OnInit {
         console.log(`Product ${item.productId}:`, product ? 'Found' : 'Not found', product);
       });
     });
-    
+
     // Force reload data
     this.loadUserData();
     this.loadCartData();

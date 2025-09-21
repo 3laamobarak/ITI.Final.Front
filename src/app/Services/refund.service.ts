@@ -18,6 +18,7 @@ export interface CreateRefundRequest {
   reason: string;
   amount: number;
   orderId: number;
+  paymentId: number;
 }
 
 export interface UpdateRefundRequest {
@@ -32,7 +33,7 @@ export interface UpdateRefundRequest {
   providedIn: 'root'
 })
 export class RefundService {
-  private apiUrl = `${environment.apiUrl}/api/Refund`;
+  private apiUrl = `${environment.apiUrl}/Refund`;
 
   constructor(private http: HttpClient) { }
 

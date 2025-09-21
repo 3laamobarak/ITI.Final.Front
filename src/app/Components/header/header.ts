@@ -23,6 +23,7 @@ import { CartServices } from '../../Services/cart-services';
 import { ICategory } from '../../Models/icategory';
 import { User } from '../../Services/user';
 
+
 @Component({
   selector: 'app-header',
   imports: [CommonModule, RouterLink],
@@ -62,19 +63,19 @@ export class Header implements OnInit, OnDestroy, AfterViewChecked {
   private search$ = new Subject<string>();
   private subs: Subscription[] = [];
 
+
   constructor(
     private productSvc: ProductServices,
     private categorySvc: CategoryServices,
     private cd: ChangeDetectorRef,
     private router: Router,
     private cartService: CartServices,
-    private userService: User
+    private userService: User,
+
   ) {}
 
   ngOnInit(): void {
-    // Check login status
-    this.checkLoginStatus();
-    
+    this.checkLoginStatus();    
     // load categories (API + fallback)
     const s1 = this.categorySvc
       .getAllCategories()
