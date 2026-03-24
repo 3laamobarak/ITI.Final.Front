@@ -1,59 +1,185 @@
-# IHerb
+# 🛒 iHerb Frontend — Angular E-Commerce
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.5.
+> **Modern Angular application for a full-featured e-commerce platform**
+> Focused on health products, supplements, and gym equipment.
 
-## Development server
+This project represents the **frontend layer** of a full-stack system, built with Angular and integrated with a .NET 8 backend API.
 
-To start a local development server, run:
+---
+
+## 🚀 Overview
+
+A real-world **e-commerce frontend experience** including:
+
+* Product discovery & filtering
+* Secure authentication flow
+* Shopping cart & checkout
+* Real-time features
+* Responsive UI across all devices
+
+---
+
+## ✨ Key Features
+
+### 🛍️ Shopping Experience
+
+* Product listing with **Search, Filters, and Categories**
+* Interactive **Category Slider**
+* Product details and dynamic UI updates
+
+### 🛒 Cart & Checkout
+
+* Real-time cart updates
+* Full checkout workflow
+* Stripe payment integration
+
+### 🔐 Authentication & Users
+
+* Login & Register system
+* OTP Email Verification
+* Protected routes using Angular Guards:
+
+  * Auth Guard
+  * No-Auth Guard
+  * Email Verification Guard
+
+### ⚡ Real-Time Features
+
+* SignalR-powered **Chat Bot**
+* Live interaction with backend services
+
+### 📱 UI/UX
+
+* Fully responsive (Mobile + Desktop)
+* Clean and modern design
+* Smooth navigation & user flow
+
+---
+
+## 🏗️ Project Structure
+
+```bash
+src/
+├── app/
+│   ├── components/       # UI components (Home, Products, Cart, Checkout...)
+│   ├── guards/           # Route guards (auth, no-auth, verify-email)
+│   ├── models/           # Interfaces (Product, User, Cart...)
+│   ├── services/         # API services (Auth, Product, Cart, Payment...)
+│   ├── environments/     # Environment configs
+│   ├── app.component.ts
+│   ├── app.routes.ts
+│   └── app.config.ts
+├── assets/
+└── styles.css
+```
+
+---
+
+## 🛠️ Tech Stack
+
+| Technology                   | Usage                      |
+| ---------------------------- | -------------------------- |
+| Angular 18+                  | Frontend framework         |
+| TypeScript                   | Core language              |
+| RxJS                         | Reactive programming       |
+| Angular Material / Bootstrap | UI & styling               |
+| HttpClient                   | API communication          |
+| SignalR Client               | Real-time features         |
+| Reactive Forms               | Form handling & validation |
+| Routing + Guards             | Navigation & security      |
+
+---
+
+## ⚙️ Getting Started
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/3laamobarak/ITI.Final.Front.git
+cd ITI.Final.Front
+```
+
+---
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+### 3. Configure API URL ⚠️
+
+Update:
+`src/environments/environment.ts`
+
+```ts
+export const environment = {
+  production: false,
+  apiUrl: 'https://localhost:5297/api'
+};
+```
+
+> Make sure the backend is running on the same port.
+
+---
+
+### 4. Run the Application
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Then open:
+👉 http://localhost:4200
 
-## Code scaffolding
+---
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## 🔗 Backend Integration
 
-```bash
-ng generate component component-name
-```
+This frontend works with the .NET backend:
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+👉 https://github.com/3laamobarak/ITI-Final-Project
 
-```bash
-ng generate --help
-```
+* REST API communication
+* Secure authentication & payments handled server-side
+* SignalR used for real-time features
 
-## Building
+---
 
-To build the project run:
+## 📌 Notes
 
-```bash
-ng build
-```
+* Designed as part of a **full-stack architecture**
+* Backend handles all sensitive logic (Auth, Payments, Orders)
+* Frontend focuses on **performance, UX, and responsiveness**
+* Easily extendable for mobile or PWA
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+## 👨‍💻 Author
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+**Alaa Mobarak**
+.NET Full-Stack & Angular Developer
+ITI Qena — 6 Months Internship
+Final Graduation Project
 
-```bash
-ng test
-```
+---
 
-## Running end-to-end tests
+## ⭐ Support
 
-For end-to-end (e2e) testing, run:
+If you like this project:
 
-```bash
-ng e2e
-```
+* ⭐ Star the repository
+* 🍴 Fork it
+* 🧠 Suggest improvements
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
-## Additional Resources
+## 📬 Feedback
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Feel free to open an issue or share your feedback!
+
+---
+
+🚀 *Built with passion for modern e-commerce experiences*
